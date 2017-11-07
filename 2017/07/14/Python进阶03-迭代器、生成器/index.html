@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Python进阶03-迭代器、生成器 | 小白龙</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1、迭代器 定义：迭代器是访问集合元素的一种方式。迭代器对象从集合的第一个元素开始访问，直到所有的元素被访问完结束。迭代器只能往前不会后退。  优点：迭代器的一大优点是不要求事先准备好整个迭代过程中所有元素。迭代器仅仅在迭代到某个元素时才计算该元素，而在这之前或之后，元素可以不存在或者被销毁。这个特点使得它特别适合用于遍历一些巨大的伙食无限的集合，比如几个G的文件。">
+<meta name="keywords" content="python,迭代器,生成器">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python进阶03-迭代器、生成器">
+<meta property="og:url" content="https//xdylanu.github.io/2017/07/14/Python进阶03-迭代器、生成器/index.html">
+<meta property="og:site_name" content="小白龙">
+<meta property="og:description" content="1、迭代器 定义：迭代器是访问集合元素的一种方式。迭代器对象从集合的第一个元素开始访问，直到所有的元素被访问完结束。迭代器只能往前不会后退。  优点：迭代器的一大优点是不要求事先准备好整个迭代过程中所有元素。迭代器仅仅在迭代到某个元素时才计算该元素，而在这之前或之后，元素可以不存在或者被销毁。这个特点使得它特别适合用于遍历一些巨大的伙食无限的集合，比如几个G的文件。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2017-10-14T12:37:42.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python进阶03-迭代器、生成器">
+<meta name="twitter:description" content="1、迭代器 定义：迭代器是访问集合元素的一种方式。迭代器对象从集合的第一个元素开始访问，直到所有的元素被访问完结束。迭代器只能往前不会后退。  优点：迭代器的一大优点是不要求事先准备好整个迭代过程中所有元素。迭代器仅仅在迭代到某个元素时才计算该元素，而在这之前或之后，元素可以不存在或者被销毁。这个特点使得它特别适合用于遍历一些巨大的伙食无限的集合，比如几个G的文件。">
+  
+    <link rel="alternative" href="/atom.xml" title="小白龙" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  
+      <link rel="stylesheet" href="//cdn.bootcss.com/animate.css/3.5.0/animate.min.css">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/font-awesome/css/font-awesome.min.css">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  
+  
+      <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  
+  <!-- 加载特效 -->
+    <script src="/js/pace.js"></script>
+    <link href="/css/pace/pace-theme-flash.css" rel="stylesheet" />
+  <script>
+      var yiliaConfig = {
+          rootUrl: '/',
+          fancybox: true,
+          animate: true,
+          isHome: false,
+          isPost: true,
+          isArchive: false,
+          isTag: false,
+          isCategory: false,
+          open_in_new: false
+      }
+  </script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+    <header id="header" class="inner">
+        <a href="/" class="profilepic">
+            
+            <img lazy-src="/img/head.jpg" class="js-avatar">
+            
+        </a>
+
+        <hgroup>
+          <h1 class="header-author"><a href="/" title="Hi Mate">Dylan</a></h1>
+        </hgroup>
+
+        
+        
+        
+            <div id="switch-btn" class="switch-btn">
+                <div class="icon">
+                    <div class="icon-ctn">
+                        <div class="icon-wrap icon-house" data-idx="0">
+                            <div class="birdhouse"></div>
+                            <div class="birdhouse_holes"></div>
+                        </div>
+                        <div class="icon-wrap icon-ribbon hide" data-idx="1">
+                            <div class="ribbon"></div>
+                        </div>
+                        
+                        <div class="icon-wrap icon-link hide" data-idx="2">
+                            <div class="loopback_l"></div>
+                            <div class="loopback_r"></div>
+                        </div>
+                        
+                        
+                        <div class="icon-wrap icon-me hide" data-idx="3">
+                            <div class="user"></div>
+                            <div class="shoulder"></div>
+                        </div>
+                        
+                    </div>
+                    
+                </div>
+                <div class="tips-box hide">
+                    <div class="tips-arrow"></div>
+                    <ul class="tips-inner">
+                        <li>菜单</li>
+                        <li>标签</li>
+                        
+                        <li>友情链接</li>
+                        
+                        
+                        <li>关于我</li>
+                        
+                    </ul>
+                </div>
+            </div>
+        
+
+        <div id="switch-area" class="switch-area">
+            <div class="switch-wrap">
+                <section class="switch-part switch-part1">
+                    <nav class="header-menu">
+                        <ul>
+                        
+                            <li><a href="/Home">博客首页</a></li>
+                        
+                            <li><a href="/works">作品展示</a></li>
+                        
+                            <li><a href="/about">留言打卡</a></li>
+                        
+                            <li><a href="/FrontEndGuide">前端导航</a></li>
+                        
+                        </ul>
+                    </nav>
+                    <nav class="header-nav">
+                        <ul class="social">
+                            
+                                <a class="fl mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                            
+                                <a class="fl github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                            
+                                <a class="fl zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                            
+                                <a class="fl weibo" target="_blank" href="#" title="weibo">weibo</a>
+                            
+                                <a class="fl google" target="_blank" href="#" title="google">google</a>
+                            
+                                <a class="fl twitter" target="_blank" href="#" title="twitter">twitter</a>
+                            
+                                <a class="fl linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                            
+                        </ul>
+                    </nav>
+                </section>
+                
+                
+                <section class="switch-part switch-part2">
+                    <div class="widget tagcloud" id="js-tagcloud">
+                        <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/UDP/" style="font-size: 10px;">UDP</a> <a href="/tags/python/" style="font-size: 20px;">python</a> <a href="/tags/生成器/" style="font-size: 10px;">生成器</a> <a href="/tags/线程/" style="font-size: 10px;">线程</a> <a href="/tags/进程/" style="font-size: 10px;">进程</a> <a href="/tags/迭代器/" style="font-size: 10px;">迭代器</a>
+                    </div>
+                </section>
+                
+                
+                
+                <section class="switch-part switch-part3">
+                    <div id="js-friends">
+                    
+                      <a target="_blank" class="main-nav-link switch-friends-link" href="http://luuman.github.io/">name</a>
+                    
+                    </div>
+                </section>
+                
+
+                
+                
+                <section class="switch-part switch-part4">
+                
+                    <div id="js-aboutme">纯海迷、爱运动、爱交友、爱旅行、喜欢接触新鲜事物、迎接新的挑战，更爱游离于错综复杂的编码与逻辑中</div>
+                </section>
+                
+            </div>
+        </div>
+    </header>                
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+      <div class="overlay">
+          <div class="slider-trigger"></div>
+          <h1 class="header-author js-mobile-header hide"><a href="/" title="Me">Dylan</a></h1>
+      </div>
+    <div class="intrude-less">
+        <header id="header" class="inner">
+            <a href="/" class="profilepic">
+                
+                    <img lazy-src="/img/head.jpg" class="js-avatar">
+                
+            </a>
+            <hgroup>
+              <h1 class="header-author"><a href="/" title="Me">Dylan</a></h1>
+            </hgroup>
+            
+            <nav class="header-menu">
+                <ul>
+                
+                    <li><a href="/Home">博客首页</a></li>
+                
+                    <li><a href="/works">作品展示</a></li>
+                
+                    <li><a href="/about">留言打卡</a></li>
+                
+                    <li><a href="/FrontEndGuide">前端导航</a></li>
+                
+                <div class="clearfix"></div>
+                </ul>
+            </nav>
+            <nav class="header-nav">
+                <div class="social">
+                    
+                        <a class="mail" target="_blank" href="http://mail.qq.com/cgi-bin/qm_share?t=qm_mailme&email=PAkNDgsKBQ4MCnxNTRJfU1E" title="mail">mail</a>
+                    
+                        <a class="github" target="_blank" href="https://github.com/luuman" title="github">github</a>
+                    
+                        <a class="zhihu" target="_blank" href="#" title="zhihu">zhihu</a>
+                    
+                        <a class="weibo" target="_blank" href="#" title="weibo">weibo</a>
+                    
+                        <a class="google" target="_blank" href="#" title="google">google</a>
+                    
+                        <a class="twitter" target="_blank" href="#" title="twitter">twitter</a>
+                    
+                        <a class="linkedin" target="_blank" href="#" title="linkedin">linkedin</a>
+                    
+                </div>
+            </nav>
+        </header>                
+    </div>
+</nav>
+      <div class="body-wrap"><article id="post-Python进阶03-迭代器、生成器" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2017/07/14/Python进阶03-迭代器、生成器/" class="article-date">
+      <time datetime="2017-07-14T12:37:20.000Z" itemprop="datePublished">2017-07-14</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Python进阶03-迭代器、生成器
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+
+        
+    <div class="article-tag tagcloud">
+        <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/python/">python</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/生成器/">生成器</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/迭代器/">迭代器</a></li></ul>
+    </div>
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+          
+        <h3 id="1、迭代器"><a href="#1、迭代器" class="headerlink" title="1、迭代器"></a>1、迭代器</h3><ul>
+<li><p>定义：迭代器是访问集合元素的一种方式。迭代器对象从集合的第一个元素开始访问，直到所有的元素被访问完结束。迭代器只能往前不会后退。</p>
+</li>
+<li><p>优点：迭代器的一大优点是不要求事先准备好整个迭代过程中所有元素。迭代器仅仅在迭代到某个元素时才计算该元素，而在这之前或之后，元素可以不存在或者被销毁。这个特点使得它特别适合用于遍历一些巨大的伙食无限的集合，比如几个G的文件。</p>
+<a id="more"></a>
+</li>
+<li><p>特点：</p>
+<ul>
+<li>访问者不需要关心迭代器内部的结构，仅需通过next()方法不断去取下一个内容。</li>
+<li>不能随机访问集合中的某个值，只能从头到尾依次访问。</li>
+<li>访问到一半时不能往回退</li>
+<li>便于循环比较大的数据集合，节省内存</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>首先讨论下迭代、迭代器、迭代对象三者的定义</p>
+<ul>
+<li>迭代是访问集合元素的一种方式。<br>例如对list、tuple、str等类型的数据使用for…in…的循环语法从其中依次拿到数据进行使用，我们把这样的过程称为遍历，也叫迭代。</li>
+<li>迭代器是一个可以记住遍历的位置的对象<br>本质：对可迭代对象进行迭代使用的过程，发现在for…in…中每循环一次都会返回对象中的下一条数据，一直向后读取数据直到迭代了所有数据后结束。在这个过程中就应该迭代器去记录每次访问到了第几天数据，以便每次迭代都可以返回下一条数据。一个实现了<code>__iter__</code>方法和<code>__next__</code>方法的对象，就是迭代器。</li>
+<li>迭代器对象从集合的一个元素开始访问，直到所有的元素被访问完结束。<br>例如通过for…in…这类语句迭代读取一条数据供我们使用的对象称之为迭代对象。<br>本质：迭代对象 通过<code>__iter__</code>方法向我们提供一个迭代器，我们在迭代一个可迭代对象的时候，实际上就是先获取该对象提供的一个迭代器，然后通过这个迭代器开一次获取对象中的每一个数据。也就是说，一个具备了<code>__iter__</code>方法的对象，就是一个可迭代对象。</li>
+</ul>
+</li>
+<li><p>如何判断一个对象是否可以迭代？<br>可以使用isinstance()判断一个对象是否是Iterable对象，当返回的是True表示是Iterable对象，是false则不是.</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> Iterable</div><div class="line"></div><div class="line">In [<span class="number">51</span>]: isinstance([], Iterable)   <span class="comment">#列表可以迭代</span></div><div class="line">Out[<span class="number">51</span>]: <span class="keyword">True</span></div><div class="line"></div><div class="line">In [<span class="number">52</span>]: isinstance(&#123;&#125;, Iterable)   <span class="comment">#字典可以迭代</span></div><div class="line">    Out[<span class="number">52</span>]: <span class="keyword">True</span></div><div class="line"></div><div class="line">In [<span class="number">53</span>]: isinstance(<span class="string">'abc'</span>, Iterable)  <span class="comment">#字符串可以迭代</span></div><div class="line">Out[<span class="number">53</span>]: <span class="keyword">True</span></div><div class="line"></div><div class="line">In [<span class="number">54</span>]: isinstance(mylist, Iterable)  <span class="comment">#mylist容器对象不能迭代</span></div><div class="line">Out[<span class="number">54</span>]: <span class="keyword">False</span></div><div class="line"></div><div class="line">In [<span class="number">55</span>]: isinstance(<span class="number">100</span>, Iterable)   <span class="comment"># int整型不是iterable ， 即int整型不是可以迭代的</span></div><div class="line">Out[<span class="number">55</span>]: <span class="keyword">False</span></div></pre></td></tr></table></figure>
+<ul>
+<li>如何判断一个对象是否是迭代器？<br>可以使用isinstance()判断一个对象是否是Iterator对象</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">56</span>]: <span class="keyword">from</span> collections <span class="keyword">import</span> Iterator</div><div class="line"></div><div class="line">In [<span class="number">57</span>]: isinstance([], Iterator)  <span class="comment"># 列表不是迭代对象</span></div><div class="line">Out[<span class="number">57</span>]: <span class="keyword">False</span></div><div class="line"></div><div class="line">In [<span class="number">58</span>]: isinstance(iter([]), Iterator) 元组是迭代对象</div><div class="line">Out[<span class="number">58</span>]: <span class="keyword">True</span></div><div class="line"></div><div class="line">In [<span class="number">59</span>]: isinstance(iter(<span class="string">"abc"</span>), Iterator)</div><div class="line">Out[<span class="number">59</span>]: <span class="keyword">True</span></div></pre></td></tr></table></figure>
+<ul>
+<li>iter()函数与next()函数<br>通过iter()函数获取可迭代对象的迭代器，然后可以对获取到的迭代器不断使用next()函数来获取下一条数据。iter()函数实际上就是调用了可迭代对象的<code>__iter__</code>方法.迭代完最后一个数据之后，再次调用next()函数会抛出stopIteration的异常，来告诉我们所有数据都已迭代完成，不用再执行next()函数。</li>
+</ul>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;</span>&gt; li = [<span class="number">11</span>, <span class="number">22</span>, <span class="number">33</span>]</div><div class="line"><span class="meta">&gt;&gt;</span>&gt; li_iter = iter(li)</div><div class="line"><span class="meta">&gt;&gt;</span>&gt; next(li_iter)</div><div class="line"><span class="number">11</span></div><div class="line"><span class="meta">&gt;&gt;</span>&gt; next(li_iter)</div><div class="line"><span class="number">22</span></div><div class="line"><span class="meta">&gt;&gt;</span>&gt; next(li_iter)</div><div class="line"><span class="number">33</span></div><div class="line"><span class="meta">&gt;&gt;</span>&gt; next(li_iter)</div><div class="line">Traceback (most recent call last)<span class="symbol">:</span></div><div class="line">  File <span class="string">"&lt;stdin&gt;"</span>, line <span class="number">1</span>, <span class="keyword">in</span> &lt;<span class="class"><span class="keyword">module</span>&gt;</span></div><div class="line">StopIteration</div><div class="line"><span class="meta">&gt;&gt;</span></div></pre></td></tr></table></figure>
+<ul>
+<li>迭代器Iterator<br>迭代器是用来帮助我们记录每次迭代访问到的位置，当我们对迭代器使用next()函数的时候，迭代器会向我们返回它所记录位置的下一个位置的数据。<br>一个实现了<code>__iter__</code>方法和<code>__next__</code>方法的对象，就是迭代器</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyList</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="string">"""自定义的一个可迭代对象"""</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self)</span>:</span></div><div class="line">        self.items = []</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">add</span><span class="params">(self, val)</span>:</span></div><div class="line">        self.items.append(val)</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></div><div class="line">        myiterator = MyIterator(self)</div><div class="line">        <span class="keyword">return</span> myiterator</div><div class="line">    <span class="class"><span class="keyword">class</span> <span class="title">MyIterator</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="string">"""自定义的供上面可迭代对象使用的一个迭代器"""</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, mylist)</span>:</span></div><div class="line">        self.mylist = mylist</div><div class="line">        <span class="comment"># current用来记录当前访问到的位置</span></div><div class="line">        self.current = <span class="number">0</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__next__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> self.current &lt; len(self.mylist.items):</div><div class="line">            item = self.mylist.items[self.current]</div><div class="line">            self.current += <span class="number">1</span></div><div class="line">            <span class="keyword">return</span> item</div><div class="line"></div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="keyword">raise</span> StopIteration</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">return</span> self</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    mylist = MyList()</div><div class="line">    mylist.add(<span class="number">1</span>)</div><div class="line">    mylist.add(<span class="number">2</span>)</div><div class="line">    mylist.add(<span class="number">3</span>)</div><div class="line">    mylist.add(<span class="number">4</span>)</div><div class="line">    mylist.add(<span class="number">5</span>)</div><div class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> mylist:</div><div class="line">        print(num)</div></pre></td></tr></table></figure>
+<ul>
+<li>斐波那契数列迭代器使用<ul>
+<li>数学中有个著名的斐波那契数列（Fibonacci）,数列中第一个数为0，第二个数为1，其后的每一个数都可由前两个数相加得到：</li>
+<li>0,1,1,2,3,5,8,13,21,34，…</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div></pre></td><td class="code"><pre><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">FibIterator</span><span class="params">(object)</span>:</span></div><div class="line">    <span class="string">"""斐波那契数列迭代器"""</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, n)</span>:</span></div><div class="line">        <span class="string">"""初始化"""</span></div><div class="line">        <span class="comment"># n: int ，指明生成数列的前n个数</span></div><div class="line">        self.n = n</div><div class="line">        <span class="comment">#  current用来保存当前生成到数列中的第几个数了</span></div><div class="line">        self.current = <span class="number">0</span></div><div class="line">        <span class="comment">#  num1用来保存前一个数，初始值为数列中的第一个数0</span></div><div class="line">        self.num1 = <span class="number">0</span></div><div class="line">        <span class="comment"># num2 用来保存前一个数，初始值为数列中的第二个数1</span></div><div class="line">        self.num2 = <span class="number">1</span></div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__next__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="string">"""被next()函数调用来获取下一个数"""</span></div><div class="line">        <span class="keyword">if</span> self.current &lt; self.n:</div><div class="line">            num = self.num1</div><div class="line">            self.num1, self.num2 = self.num2, self.num1 + self.num2</div><div class="line">            <span class="comment"># current 用来记录当前访问的位置</span></div><div class="line">            self.current += <span class="number">1</span></div><div class="line">            <span class="keyword">return</span> num</div><div class="line"></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__iter__</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="string">"""迭代器的_iter__返回自身即可"""</span></div><div class="line">        <span class="keyword">return</span> self</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    fib = FibIterator(<span class="number">10</span>)</div><div class="line">    <span class="keyword">for</span> num <span class="keyword">in</span> fib:</div><div class="line">        print(num, end=<span class="string">""</span>)</div></pre></td></tr></table></figure>
+<p>补充：<br>   并不是只要for循环能接收可迭代对象<br>   除了for循环能接收可迭代对象，list、tuple等也能接收。<br>   li = list(FibIterator(15))<br>   print(li)<br>   tp = tuple(FibIterator(6))<br>   print(tp</p>
+<hr>
+<h3 id="2-生成器"><a href="#2-生成器" class="headerlink" title="2.生成器"></a>2.生成器</h3><ul>
+<li>一个函数调用时返回一个迭代器，那这个函数就叫做生成器（generator）;如果函数中包含yield语法，那这个函数就会变成生成器；</li>
+<li>要创造一个generator，有很多种方法。第一种方法很简单，只要把一个列表生成式的[]改成（），就创建了一个generator.</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="meta">&gt;&gt;&gt; </span>L = [x * x <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10</span>)]</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>L</div><div class="line">[<span class="number">0</span>, <span class="number">1</span>, <span class="number">4</span>, <span class="number">9</span>, <span class="number">16</span>, <span class="number">25</span>, <span class="number">36</span>, <span class="number">49</span>, <span class="number">64</span>, <span class="number">81</span>]</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>g = (x * x <span class="keyword">for</span> x <span class="keyword">in</span> range(<span class="number">10</span>))</div><div class="line"><span class="meta">&gt;&gt;&gt; </span>g</div><div class="line">&lt;generator object &lt;genexpr&gt; at <span class="number">0x1022ef630</span>&gt;</div></pre></td></tr></table></figure>
+<p>1&gt; 创建L和g的区别仅在于最外层的[]和(),L是list,而g是一个generator<br>2&gt; 我们可以直接打印出list的每一个元素，但我们怎么打印出generator的每一个元素呢？<br>3&gt; 如果要一个一个打印出来，可以通过next()函数获得generator的下一个返回值。<br>4&gt; generator保存的是算法，每次调用next(g),就计算出g的下一个元素的值，直到计算到最后一个元素，没有更多的元素时，抛出StopIteration的错误。<br>5&gt; 要是不断调用next(g)是不是太变态了，正确的打开方式是使用for循环，是不是很爽？因为generator也是可迭代对象哦。这样就不需要关心什么StopIteration的错误了。</p>
+<ul>
+<li>使用yield关键字修改斐波那契数列迭代器程序</li>
+</ul>
+<figure class="highlight clean"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">30</span>]: def fib(n):</div><div class="line">....:     current = <span class="number">0</span></div><div class="line">....:     num1, num2 = <span class="number">0</span>, <span class="number">1</span></div><div class="line">....:     while current &lt; n:</div><div class="line">....:         num = num1</div><div class="line">....:         num1, num2 = num2, num1+num2</div><div class="line">....:         current += <span class="number">1</span></div><div class="line">....:         yield num</div><div class="line">....:     return <span class="string">'done'</span></div><div class="line">....:</div></pre></td></tr></table></figure>
+<ul>
+<li>但函数执行到yied时停止执行，会返回一个生成器对象</li>
+<li>使用yield关键字的函数不再是函数，而是生成器。（使用了yield的函数就是生成器）</li>
+<li>yield关键字有两点作用：<ul>
+<li>保存当前运行状态（断点），然后暂停执行，即将生成器（函数）挂起</li>
+<li>将yield关键字后面表达式的值作为返回值返回，此时可以理解为起到了return的作用</li>
+</ul>
+</li>
+<li>可以使用next()函数让生成器从断点出继续执行，即唤醒生成器（函数）</li>
+<li><p>python3中的生成器可以使用rerurn返回最终运行的返回值，而Python2中的生成器不允许使用return返回一个返回值（即可以使用return从生成器中退出，但return后不能有任何表达式）。</p>
+</li>
+<li><p>唤醒生成器：</p>
+<ul>
+<li>使用<code>__next__()</code>函数唤醒生成器继续执行（不常用）</li>
+<li>使用next()函数唤醒生成器继续执行</li>
+<li>使用send()函数来唤醒执行，使用send()函数的一个好处就是可以在唤醒的同时向断点出传入一个附加数据。</li>
+</ul>
+</li>
+<li>next与send的区别<ul>
+<li>next或者send调用的结果一定是yield后面的值</li>
+<li>next不能给生成器传递参数</li>
+<li>send可以传递参数，当使用send传递的时候，就相当于yield xxx的结果，因此i = yield 1 此时就变成了i 的值为send的参数。</li>
+</ul>
+</li>
+</ul>
+
+      
+      
+        <div class="page-reward">
+          <p><a href="javascript:void(0)" onclick="dashangToggle()" class="dashang">赏</a></p>
+          <div class="hide_box"></div>
+          <div class="shang_box">
+            <a class="shang_close" href="javascript:void(0)" onclick="dashangToggle()">×</a>
+            <div class="shang_tit">
+              <p>纯属好玩</p>
+            </div>
+            <div class="shang_payimg">
+              <img src="/img/alipayimg.jpg" alt="扫码支持" title="扫一扫" />
+            </div>
+              <div class="pay_explain">扫码打赏，你说多少就多少</div>
+            <div class="shang_payselect">
+              
+                <div class="pay_item checked" data-id="alipay">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/alipay.png" alt="支付宝" /></span>
+                </div>
+              
+              
+                <div class="pay_item" data-id="wechat">
+                  <span class="radiobox"></span>
+                  <span class="pay_logo"><img src="/img/weixin.png" alt="微信" /></span>
+                </div>
+              
+            </div>
+            <div class="shang_info">
+              <p>打开<span id="shang_pay_txt">支付宝</span>扫一扫，即可进行扫码打赏哦</p>
+            </div>
+          </div>
+        </div>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/zepto/1.2.0/zepto.min.js"></script>
+        <script type="text/javascript">
+          $(".pay_item").click(function(){
+            $(this).addClass('checked').siblings('.pay_item').removeClass('checked');
+            var dataid=$(this).attr('data-id');
+            $(".shang_payimg img").attr("src","/img/"+dataid+"img.jpg");
+            $("#shang_pay_txt").text(dataid=="alipay"?"支付宝":"微信");
+          });
+          function dashangToggle(){
+            
+            $(".hide_box").fadeToggle();
+            $(".shang_box").fadeToggle();
+          }
+        </script>
+      
+    </div>
+    
+  </div>
+  
+    
+    <div class="copyright">
+        <p><span>本文标题:</span><a href="/2017/07/14/Python进阶03-迭代器、生成器/">Python进阶03-迭代器、生成器</a></p>
+        <p><span>文章作者:</span><a href="/" title="访问 Dylan 的个人博客">Dylan</a></p>
+        <p><span>发布时间:</span>2017年07月14日 - 20时37分</p>
+        <p><span>最后更新:</span>2017年10月14日 - 20时37分</p>
+        <p>
+            <span>原始链接:</span><a class="post-url" href="/2017/07/14/Python进阶03-迭代器、生成器/" title="Python进阶03-迭代器、生成器">https//xdylanu.github.io/2017/07/14/Python进阶03-迭代器、生成器/</a>
+            <span class="copy-path" data-clipboard-text="原文: https//xdylanu.github.io/2017/07/14/Python进阶03-迭代器、生成器/　　作者: Dylan" title="点击复制文章链接"><i class="fa fa-clipboard"></i></span>
+            <script src="/js/clipboard.min.js"></script>
+            <script> var clipboard = new Clipboard('.copy-path'); </script>
+        </p>
+        <p>
+            <span>许可协议:</span><i class="fa fa-creative-commons"></i> <a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/3.0/cn/" title="中国大陆 (CC BY-NC-SA 3.0 CN)" target = "_blank">"署名-非商用-相同方式共享 3.0"</a> 转载请保留原文链接及作者。
+        </p>
+    </div>
+
+
+
+<nav id="article-nav">
+  
+  
+    <a href="/2017/07/14/python进阶02-网络编程/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">python进阶02-网络编程</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+    <div id="toc" class="toc-article">
+    <strong class="toc-title">文章目录</strong>
+    <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、迭代器"><span class="toc-number">1.</span> <span class="toc-text">1、迭代器</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-生成器"><span class="toc-number">2.</span> <span class="toc-text">2.生成器</span></a></li></ol>
+</div>
+<input type="button" id="tocButton" value="隐藏目录"  title="点击按钮隐藏或者显示文章目录">
+
+<script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script>
+    var valueHide = "隐藏目录";
+    var valueShow = "显示目录";
+
+    if ($(".left-col").is(":hidden")) {
+        $("#tocButton").attr("value", valueShow);
+    }
+    $("#tocButton").click(function() {
+        if ($("#toc").is(":hidden")) {
+            $("#tocButton").attr("value", valueHide);
+            $("#toc").slideDown(320);
+        }
+        else {
+            $("#tocButton").attr("value", valueShow);
+            $("#toc").slideUp(350);
+        }
+    })
+    if ($(".toc").length < 1) {
+        $("#toc, #tocButton").hide();
+    }
+</script>
+
+
+
+
+
+<div class="bdsharebuttonbox">
+	<a href="#" class="fx fa-weibo bds_tsina" data-cmd="tsina" title="分享到新浪微博"></a>
+	<a href="#" class="fx fa-weixin bds_weixin" data-cmd="weixin" title="分享到微信"></a>
+	<a href="#" class="fx fa-qq bds_sqq" data-cmd="sqq" title="分享到QQ好友"></a>
+	<a href="#" class="fx fa-facebook-official bds_fbook" data-cmd="fbook" title="分享到Facebook"></a>
+	<a href="#" class="fx fa-twitter bds_twi" data-cmd="twi" title="分享到Twitter"></a>
+	<a href="#" class="fx fa-linkedin bds_linkedin" data-cmd="linkedin" title="分享到linkedin"></a>
+	<a href="#" class="fx fa-files-o bds_copy" data-cmd="copy" title="分享到复制网址"></a>
+</div>
+<script>window._bd_share_config={"common":{"bdSnsKey":{},"bdText":"","bdMini":"2","bdMiniList":false,"bdPic":"","bdStyle":"2","bdSize":"24"},"share":{}};with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='/static/api/js/share.js?v=89860593.js?cdnversion='+~(-new Date()/36e5)];</script>
+
+
+
+
+    
+        <div id="gitments"></div>
+<script src="/js/gitment.browser.js"></script>
+<script>
+    var gitment = new Gitment({
+      id: window.location.pathname,
+      owner: 'luuman',
+      repo: 'luuman.github.io',
+      oauth: {
+        client_id: '',
+        client_secret: '',
+      },
+    })
+    gitment.render('gitments')
+</script>
+    
+
+
+
+    <div class="scroll" id="post-nav-button">
+        
+            <a href="/" title="回到主页"><i class="fa fa-home"></i></a>
+        
+        <a title="文章列表"><i class="fa fa-bars"></i><i class="fa fa-times"></i></a>
+        
+            <a href="/2017/07/14/python进阶02-网络编程/" title="下一篇: python进阶02-网络编程">
+                <i class="fa fa-angle-right"></i>
+            </a>
+        
+    </div>
+    <ul class="post-list"><li class="post-list-item"><a class="post-list-link" href="/2017/07/14/Python进阶03-迭代器、生成器/">Python进阶03-迭代器、生成器</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/14/python进阶02-网络编程/">python进阶02-网络编程</a></li><li class="post-list-item"><a class="post-list-link" href="/2017/07/14/Python进阶01-多线程编程/">Python进阶01-多线程编程</a></li></ul>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+    <script>
+        $(".post-list").addClass("toc-article");
+        $(".post-list-item a").attr("target","_blank");
+        $("#post-nav-button > a:nth-child(2)").click(function() {
+            $(".fa-bars, .fa-times").toggle();
+            $(".post-list").toggle(300);
+            if ($(".toc").length > 0) {
+                $("#toc, #tocButton").toggle(200, function() {
+                    if ($(".switch-area").is(":visible")) {
+                        $("#tocButton").attr("value", valueHide);
+                        }
+                    })
+            }
+            else {
+            }
+        })
+    </script>
+
+
+
+    <script>
+        
+    </script>
+</div>
+      <footer id="footer">
+    <div class="outer">
+        <div id="footer-info">
+            <div class="footer-left">
+                &copy; 2017 Dylan
+            </div>
+            <div class="footer-right">
+                <a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/luuman/hexo-theme-spfk" target="_blank">spfk</a> by luuman
+            </div>
+        </div>
+        
+            <div class="visit">
+                
+                    <span id="busuanzi_container_site_pv" style='display:none'>
+                        <span id="site-visit" >海贼到访数: 
+                            <span id="busuanzi_value_site_uv"></span>
+                        </span>
+                    </span>
+                
+                
+                    <span>, </span>
+                
+                
+                    <span id="busuanzi_container_page_pv" style='display:none'>
+                        <span id="page-visit">本页阅读量: 
+                            <span id="busuanzi_value_page_pv"></span>
+                        </span>
+                    </span>
+                
+            </div>
+        
+    </div>
+</footer>
+
+    </div>
+    <script src="https://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js"></script>
+<script src="/js/main.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var backgroundnum = 24;
+            var backgroundimg = "url(/background/bg-x.jpg)".replace(/x/gi, Math.ceil(Math.random() * backgroundnum));
+            $("#mobile-nav").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+            $(".left-col").css({"background-image": backgroundimg,"background-size": "cover","background-position": "center"});
+        })
+    </script>
+
+
+
+
+
+<div class="scroll" id="scroll">
+    <a href="#"><i class="fa fa-arrow-up"></i></a>
+    <a href="#comments"><i class="fa fa-comments-o"></i></a>
+    <a href="#footer"><i class="fa fa-arrow-down"></i></a>
+</div>
+<script>
+    $(document).ready(function() {
+        if ($("#comments").length < 1) {
+            $("#scroll > a:nth-child(2)").hide();
+        };
+    })
+</script>
+
+<script async src="https://dn-lbstatics.qbox.me/busuanzi/2.3/busuanzi.pure.mini.js">
+</script>
+
+  <script language="javascript">
+    $(function() {
+        $("a[title]").each(function() {
+            var a = $(this);
+            var title = a.attr('title');
+            if (title == undefined || title == "") return;
+            a.data('title', title).removeAttr('title').hover(
+
+            function() {
+                var offset = a.offset();
+                $("<div id=\"anchortitlecontainer\"></div>").appendTo($("body")).html(title).css({
+                    top: offset.top - a.outerHeight() - 15,
+                    left: offset.left + a.outerWidth()/2 + 1
+                }).fadeIn(function() {
+                    var pop = $(this);
+                    setTimeout(function() {
+                        pop.remove();
+                    }, pop.text().length * 800);
+                });
+            }, function() {
+                $("#anchortitlecontainer").remove();
+            });
+        });
+    });
+</script>
+
+
+  </div>
+</body>
+</html>
