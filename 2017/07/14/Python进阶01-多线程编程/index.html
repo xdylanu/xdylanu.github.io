@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" >
+  <link rel="dns-prefetch" href="http://yoursite.com">
+  <title>Python进阶01-多线程编程 | 小白龙</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="1. 多线程 概念：简单地说操作系统可以同时执行多个不用程序。例如：一边用浏览器上网，一边在听音乐，一边在用笔记软件记笔记。  并发：指的是任务数多余cpu核数，通过操作系统的各种任务调度算法，实现用多个任务“一起”执行（实际上总有一些任务不在执行，因为切换任务的熟度相当快，看上去一起执行而已）  并行：指的是任务数小于等于CPU核数，即任务真的是一起执行的。">
+<meta name="keywords" content="线程,进程,python">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Python进阶01-多线程编程">
+<meta property="og:url" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index.html">
+<meta property="og:site_name" content="小白龙">
+<meta property="og:description" content="1. 多线程 概念：简单地说操作系统可以同时执行多个不用程序。例如：一边用浏览器上网，一边在听音乐，一边在用笔记软件记笔记。  并发：指的是任务数多余cpu核数，通过操作系统的各种任务调度算法，实现用多个任务“一起”执行（实际上总有一些任务不在执行，因为切换任务的熟度相当快，看上去一起执行而已）  并行：指的是任务数小于等于CPU核数，即任务真的是一起执行的。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index_files/01.gif">
+<meta property="og:image" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index_files/02.gif">
+<meta property="og:image" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index_files/03.gif">
+<meta property="og:image" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index_files/04.gif">
+<meta property="og:image" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index_files/05.png">
+<meta property="og:image" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index_files/13123123123123126.gif">
+<meta property="og:updated_time" content="2017-10-14T12:36:04.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Python进阶01-多线程编程">
+<meta name="twitter:description" content="1. 多线程 概念：简单地说操作系统可以同时执行多个不用程序。例如：一边用浏览器上网，一边在听音乐，一边在用笔记软件记笔记。  并发：指的是任务数多余cpu核数，通过操作系统的各种任务调度算法，实现用多个任务“一起”执行（实际上总有一些任务不在执行，因为切换任务的熟度相当快，看上去一起执行而已）  并行：指的是任务数小于等于CPU核数，即任务真的是一起执行的。">
+<meta name="twitter:image" content="http://yoursite.com/2017/07/14/Python进阶01-多线程编程/index_files/01.gif">
+  
+    <link rel="alternative" href="/atom.xml" title="小白龙" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" type="text/css" href="/./main.04d600.css">
+  <style type="text/css">
+  
+    #container.show {
+      background: linear-gradient(200deg,rgba(183, 176, 175, 0.67),rgba(255, 235, 59, 0.28));
+    }
+  </style>
+  
+
+  
+
+</head>
+
+<body>
+  <div id="container" q-class="show:isCtnShow">
+    <canvas id="anm-canvas" class="anm-canvas"></canvas>
+    <div class="left-col" q-class="show:isShow">
+      
+<div class="overlay" style="background: #F44336"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			<img src="/img/avatar.png" class="js-avatar" >
+		</a>
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Dylan</a></h1>
+		</hgroup>
+		
+
+		<nav class="header-menu">
+			<ul>
+			
+				<li><a href="/">主页</a></li>
+	        
+				<li><a href="/tags">随笔</a></li>
+	        
+			</ul>
+		</nav>
+		<nav class="header-smart-menu">
+    		
+    			
+    			<a q-on="click: openSlider(e, 'innerArchive')" href="javascript:void(0)">所有文章</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'friends')" href="javascript:void(0)">友链</a>
+    			
+            
+    			
+    			<a q-on="click: openSlider(e, 'aboutme')" href="javascript:void(0)">关于我</a>
+    			
+            
+		</nav>
+		<nav class="header-nav">
+			<div class="social">
+				
+					<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+		        
+					<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+		        
+					<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+		        
+					<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+		        
+			</div>
+		</nav>
+	</header>		
+</div>
+
+    </div>
+    <div class="mid-col" q-class="show:isShow,hide:isShow|isFalse">
+      
+<nav id="mobile-nav">
+  	<div class="overlay js-overlay" style="background: #F44336"></div>
+	<div class="btnctn js-mobile-btnctn">
+  		<div class="slider-trigger list" q-on="click: openSlider(e)"><i class="icon icon-sort"></i></div>
+	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="/img/avatar.png" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author js-header-author">Dylan</h1>
+			</hgroup>
+			
+			
+			
+				
+			
+				
+			
+			
+			
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="#" title="github"><i class="icon-github"></i></a>
+			        
+						<a class="weibo" target="_blank" href="#" title="weibo"><i class="icon-weibo"></i></a>
+			        
+						<a class="rss" target="_blank" href="#" title="rss"><i class="icon-rss"></i></a>
+			        
+						<a class="zhihu" target="_blank" href="#" title="zhihu"><i class="icon-zhihu"></i></a>
+			        
+				</div>
+			</nav>
+
+			<nav class="header-menu js-header-menu">
+				<ul style="width: 50%">
+				
+				
+					<li style="width: 50%"><a href="/">主页</a></li>
+		        
+					<li style="width: 50%"><a href="/tags">随笔</a></li>
+		        
+				</ul>
+			</nav>
+		</header>				
+	</div>
+	<div class="mobile-mask" style="display:none" q-show="isShow"></div>
+</nav>
+
+      <div id="wrapper" class="body-wrap">
+        <div class="menu-l">
+          <div class="canvas-wrap">
+            <canvas data-colors="#eaeaea" data-sectionHeight="100" data-contentId="js-content" id="myCanvas1" class="anm-canvas"></canvas>
+          </div>
+          <div id="js-content" class="content-ll">
+            <article id="post-Python进阶01-多线程编程" class="article article-type-post " itemscope itemprop="blogPost">
+  <div class="article-inner">
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Python进阶01-多线程编程
+    </h1>
+  
+
+        
+        <a href="/2017/07/14/Python进阶01-多线程编程/" class="archive-article-date">
+  	<time datetime="2017-07-14T12:24:36.000Z" itemprop="datePublished"><i class="icon-calendar icon"></i>2017-07-14</time>
+</a>
+        
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h4 id="1-多线程"><a href="#1-多线程" class="headerlink" title="1. 多线程"></a>1. 多线程</h4><ul>
+<li><p><strong>概念</strong>：简单地说操作系统可以同时执行多个不用程序。例如：一边用浏览器上网，一边在听音乐，一边在用笔记软件记笔记。</p>
+</li>
+<li><p><strong>并发</strong>：指的是任务数多余cpu核数，通过操作系统的各种任务调度算法，实现用多个任务“一起”执行（实际上总有一些任务不在执行，因为切换任务的熟度相当快，看上去一起执行而已）</p>
+</li>
+<li><p><strong>并行</strong>：指的是任务数小于等于CPU核数，即任务真的是一起执行的。</p>
+<a id="more"></a>
+</li>
+</ul>
+<h4 id="2-线程"><a href="#2-线程" class="headerlink" title="2. 线程"></a>2. 线程</h4><ul>
+<li><p>概念：线程是进程的一个实体，是CPU调度和分派的基本单位。</p>
+</li>
+<li><p>threading–单线程执行：</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">saySorry</span><span class="params">()</span>:</span></div><div class="line">    print(<span class="string">"亲爱的，我错了，我能吃饭了吗？"</span>)</div><div class="line">    <span class="comment"># 时间停顿1秒</span></div><div class="line">    time.sleep(<span class="number">1</span>)</div><div class="line"></div><div class="line"></div><div class="line"><span class="keyword">if</span>  __name__ == <span class="string">"__main__"</span>:</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</div><div class="line">        saySorry()</div></pre></td></tr></table></figure>
+<p>运行结果：<br><img src="index_files/01.gif" alt=""></p>
+<ul>
+<li>threading–多线程执行：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> threading</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">saySorry</span><span class="params">()</span>:</span></div><div class="line">    print(<span class="string">"亲爱的，我错了，我能吃饭了吗？"</span>)</div><div class="line">    time.sleep(<span class="number">1</span>)</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">5</span>):</div><div class="line">        t = threading.Threading(target=saySorry)</div><div class="line">        <span class="comment"># 启动线程，即让线程开始执行</span></div><div class="line">        t.start()</div></pre></td></tr></table></figure>
+<p>运行结果：<br><img src="index_files/02.gif" alt=""></p>
+<ul>
+<li><p>单线程与多线程比较</p>
+<ul>
+<li>单线程要比多线程花费时间多</li>
+<li>在创建完线程，需要调用start()方法来启动</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>查看线程数量</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> threading</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyThread</span><span class="params">(threading.Thread)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</div><div class="line">            time.sleep(<span class="number">1</span>)</div><div class="line">            <span class="comment"># name 属性中保存的是当前线程的名字</span></div><div class="line">            msg = <span class="string">"I'm"</span> +self.name + <span class="string">'@'</span> +str(i) </div><div class="line">            print(msg)</div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    t = MyThread()</div><div class="line">    t.start()</div><div class="line"><span class="comment"># 通过带下标索引enumerate()方法</span></div><div class="line">length = len(threading.enumerate())</div><div class="line">print(<span class="string">"当前运行的线程数为：%d"</span>%length)</div></pre></td></tr></table></figure>
+<ul>
+<li>线程执行代码的封装：<blockquote>
+<p>思考：定义一个新的子类class,只有继承threading.Thead就可以，然后重写run方法。</p>
+</blockquote>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> threading</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyThread</span><span class="params">(threading.Thread)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</div><div class="line">            time.sleep(<span class="number">1</span>)</div><div class="line">            msg = <span class="string">"I'm"</span> +self.name + <span class="string">'@'</span> +str(i) <span class="comment">#name 属性中保存的是当前线程的名字</span></div><div class="line">            print(msg)</div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</div><div class="line">    t = MyThread()</div><div class="line">    t.start()</div></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<p><img src="index_files/03.gif" alt=""></p>
+<p>说明：threading.Thread类有一个run方法，用户定义线程的功能函数，可以在自己的线程类中覆盖该方法。而创建自己的线程实例后，通过Thread类的start方法，可以启动该线程，当该线程获得执行的机会时，就会调用run方法执行线程。</p>
+<ul>
+<li><p>线程的状态</p>
+<ul>
+<li><p>多线程的执行顺序是不确定的。当执行到sleep语句时，线程将被阻塞，到sleep结束后，线程进入就绪状态，等待调度。而线程调度将自行选择一个线程执行。</p>
+</li>
+<li><p>状态：<br>(1) New 创建线程<br>(2) Runnable 就绪，等待调度<br>(3) Running 运行。<br>(4) Blocked 阻塞。阻塞可能在Wait Locked Sleeping<br>(5) Dead 消亡</p>
+</li>
+</ul>
+</li>
+<li><p>线程中执行到阻塞，可能有三种情况：</p>
+<ul>
+<li>同步：线程中获取同步锁，但是资源已经被其他线程锁定时，进入Locked状态，直到该资源可获取（获取的顺序由Lock队列控制）</li>
+<li>睡眠：线程运行sleep()或join()方法后，线程进入Sleeping状态。区别在于sleep等待固定的时间，而join是等待子线程执行完。当然join也可以指定一个“超时时间”。从语义上来说，如果两个线程a,b, 在a中调用b.join()，相当于合并(join)成一个线程。最常见的情况是在主线程中join所有的子线程。</li>
+<li>等待：线程中执行wait()方法后，线程进入Waiting状态，等待其他线程的通知(notify）。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>线程类型<br>线程有着不同的状态，也有不同的类型：</p>
+<ul>
+<li>主线程</li>
+<li>子线程</li>
+<li>守护线程（后台线程）</li>
+<li>前台线程</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>多线程–共享全局变量问题</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> threading <span class="keyword">import</span> Thread</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line">g_num = <span class="number">100</span></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">work1</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">global</span> g_num</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">3</span>):</div><div class="line">        g_num += <span class="number">1</span></div><div class="line"></div><div class="line">    print(<span class="string">"----in work1, g_num is %d---"</span>%g_num)</div><div class="line"></div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">work2</span><span class="params">()</span>:</span></div><div class="line">    <span class="keyword">global</span> g_num</div><div class="line">    print(<span class="string">"----in work2, g_num is %d---"</span>%g_num)</div><div class="line"></div><div class="line"></div><div class="line">print(<span class="string">"---线程创建之前g_num is %d---"</span>%g_num)</div><div class="line"></div><div class="line">t1 = Thread(target=work1)</div><div class="line">t1.start()</div><div class="line"></div><div class="line"><span class="comment">#延时一会，保证t1线程中的事情做完</span></div><div class="line">time.sleep(<span class="number">1</span>)</div><div class="line"></div><div class="line">t2 = Thread(target=work2)</div><div class="line">t2.start()</div></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<p><code>---线程创建之前g_num is 100---</code><br><code>----in work1, g_num is 103---</code><br><code>----in work2, g_num is 103---</code></p>
+<ul>
+<li><p>共享全局变量问题说明：</p>
+<ul>
+<li>在一个进程内的所有线程共享全局变量，很方便在多个线程间共享数据。</li>
+<li>缺点就是，线程是对全局变量随意更改可能造成多线程之间对全局变量的混乱（即线程非安全）</li>
+<li>如果多个线程它同时对同一个全局变量操作，会出现资源竞争问题，从而数据结果会不正确。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li>解决方案：<br>可以通过线程同步来进行解决线程同时修改全局变量的方式，在线程对全局变量进行修改时，都要先上锁，处理完后再解锁，在上锁的整个过程中不允许其他线程访问，就保证了数据的正确性。</li>
+</ul>
+<h4 id="3-同步与互斥锁"><a href="#3-同步与互斥锁" class="headerlink" title="3. 同步与互斥锁"></a>3. 同步与互斥锁</h4><h5 id="3-1-同步"><a href="#3-1-同步" class="headerlink" title="3.1 同步"></a>3.1 同步</h5><ul>
+<li>如果多个线程共同对某个数据修改，则可能出现不可预料的结果，为了保证数据的正确性，需要对多个线程进行同步。</li>
+<li>使用Tread对象的Lock和Rlock可以实现简单的线程同步，这两个对象都有acquire方法和release方法。对于那些需要每次只允许一个线程操作的数据，可以将其操作放到acquire和release方法之间。</li>
+</ul>
+<h5 id="3-2-互斥锁"><a href="#3-2-互斥锁" class="headerlink" title="3.2 互斥锁"></a>3.2 互斥锁</h5><ul>
+<li>互斥锁为资源引入一个状态：锁定/非锁定</li>
+<li>互斥锁的作用：保证每次只有一个线程进行写入操作，从而保证了多线程情况下数据的正确性。</li>
+<li>threading 模块中定义了Loack类，可以方便处理锁定：</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> threading</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyThread1</span><span class="params">(threading.Thread)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> mutexA.acquire():</div><div class="line">            print(self.name+<span class="string">'----do1---up----'</span>)</div><div class="line">            time.sleep(<span class="number">1</span>)</div><div class="line"></div><div class="line">            <span class="keyword">if</span> mutexB.acquire():</div><div class="line">                print(self.name+<span class="string">'----do1---down----'</span>)</div><div class="line">                mutexB.release()</div><div class="line">            mutexA.release()</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyThread2</span><span class="params">(threading.Thread)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> mutexB.acquire():</div><div class="line">            print(self.name+<span class="string">'----do2---up----'</span>)</div><div class="line">            time.sleep(<span class="number">1</span>)</div><div class="line">            <span class="keyword">if</span> mutexA.acquire():</div><div class="line">                print(self.name+<span class="string">'----do2---down----'</span>)</div><div class="line">                mutexA.release()</div><div class="line">            mutexB.release()</div><div class="line"></div><div class="line">mutexA = threading.Lock()</div><div class="line">mutexB = threading.Lock()</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    t1 = MyThread1()</div><div class="line">    t2 = MyThread2()</div><div class="line">    t1.start()</div><div class="line">    t2.start()</div><div class="line"><span class="comment"># 创建锁</span></div><div class="line">mutex = threading.Lock()</div><div class="line"></div><div class="line"><span class="comment"># 锁定</span></div><div class="line"><span class="comment"># acquire 获得，取得，学到，捕获。</span></div><div class="line">mutex.acquire([blocking])  </div><div class="line"></div><div class="line"><span class="comment"># 释放</span></div><div class="line">mutex.release()</div></pre></td></tr></table></figure>
+<ul>
+<li>说明：锁定方法acquirc 可以有一个blocking参数<ul>
+<li>如果设定blocking为True，则当前线程会阻塞，直到获取到这个锁为止（如果没有指定，那么默认为True）</li>
+<li>如果设定blocking 为False，则当前线程不会阻塞。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>上锁解锁的过程</p>
+<ul>
+<li>当一个线程调用锁的acquire()方法获得锁时，锁就进入“locked” 状态。</li>
+<li>每次只有一个线程可以获得锁。如果此时另一个线程试图获得这个锁，该线程就会变为“blocked”状态，称为“阻塞”，直到拥有锁的线程调用锁的release()方法释放锁之后，锁进入“unlocked”状态。</li>
+<li>线程调度程序从处于同步阻塞状态的线程中选择一个来获得锁，并使得该线程进入运行（running）状态。</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>锁的好处：</p>
+<ul>
+<li>确保了某段关键代码只能由一个线程从头到尾完整地执行</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p>锁的坏处：</p>
+<ul>
+<li>阻止了多线程并发执行，包含锁的某段代码实际上只能以单线程模式执行，效率就大大地下降了</li>
+<li>由于可以存在多个锁，不同的线程持有不同的锁，并试图获取对方持有的锁时，可能会造成死锁</li>
+</ul>
+</li>
+<li><p>死锁<br>定义：在线程间共享多个资源的时候，如果两个线程分别占有一部分资源并且同时等待对方的资源，就会造成死锁。<br>例子：</p>
+</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> threading</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyThread1</span><span class="params">(threading.Thread)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> mutexA.acquire():</div><div class="line">            print(self.name+<span class="string">'----do1---up----'</span>)</div><div class="line">            time.sleep(<span class="number">1</span>)</div><div class="line"></div><div class="line">            <span class="keyword">if</span> mutexB.acquire():</div><div class="line">                print(self.name+<span class="string">'----do1---down----'</span>)</div><div class="line">                mutexB.release()</div><div class="line">            mutexA.release()</div><div class="line"></div><div class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyThread2</span><span class="params">(threading.Thread)</span>:</span></div><div class="line">    <span class="function"><span class="keyword">def</span> <span class="title">run</span><span class="params">(self)</span>:</span></div><div class="line">        <span class="keyword">if</span> mutexB.acquire():</div><div class="line">            print(self.name+<span class="string">'----do2---up----'</span>)</div><div class="line">            time.sleep(<span class="number">1</span>)</div><div class="line">            <span class="keyword">if</span> mutexA.acquire():</div><div class="line">                print(self.name+<span class="string">'----do2---down----'</span>)</div><div class="line">                mutexA.release()</div><div class="line">            mutexB.release()</div><div class="line"></div><div class="line">mutexA = threading.Lock()</div><div class="line">mutexB = threading.Lock()</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__ == <span class="string">'__main__'</span>:</div><div class="line">    t1 = MyThread1()</div><div class="line">    t2 = MyThread2()</div><div class="line">    t1.start()</div><div class="line">    t2.start()</div></pre></td></tr></table></figure>
+<p>运行结果<br><img src="index_files/04.gif" alt=""></p>
+<ul>
+<li>避免死锁<ul>
+<li>程序设计时要尽量避免死锁（银行家算法）</li>
+<li>添加超时时间等。</li>
+</ul>
+</li>
+</ul>
+<h4 id="4-进程"><a href="#4-进程" class="headerlink" title="4. 进程"></a>4. 进程</h4><p>定义：一个程序运行起来后，代码和用到的资源称之为进程。它是操作系统分配资源的基本单元。</p>
+<h5 id="4-1-进程的状态"><a href="#4-1-进程的状态" class="headerlink" title="4.1 进程的状态"></a>4.1 进程的状态</h5><p>图分析：<br><img src="index_files/05.png" alt=""></p>
+<p>就绪态：运行的条件都已经慢去，正去等待cpu执行。<br>执行态：cpu正在执行其功能<br>等待态：等待某些条件满足，例如一个程序sleep了，此时就处于等待态。</p>
+<h5 id="4-2-进程的创建"><a href="#4-2-进程的创建" class="headerlink" title="4.2 进程的创建"></a>4.2 进程的创建</h5><p>进程的创建实现例子：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Process</div><div class="line"><span class="keyword">import</span> time</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">run_proc</span><span class="params">()</span>:</span></div><div class="line">    <span class="string">"""子进程要执行的代码"""</span></div><div class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">        print(<span class="string">"----2----"</span>)</div><div class="line">        time.sleep(<span class="number">1</span>)</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</div><div class="line">    p = Process(target=run_proc)  <span class="comment">#创建一个进程</span></div><div class="line">    p.start()  <span class="comment">#创建一个Process 实例，用start（）方式启动。</span></div><div class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">        print(<span class="string">"----1----"</span>)</div><div class="line">        time.sleep(<span class="number">1</span>)</div></pre></td></tr></table></figure>
+<ul>
+<li>multiprocessing模块说明：multiprocessing模块是多跨平台版本的多进程模块，提供了一个Process类来代表一个进程对象，这个对象可以理解为是一个独立的进程，可以执行另外的事情。</li>
+<li>Process语法结构<br>Process([group [, target [, name [, args [, kwargs]]]]])<ul>
+<li>target：如果传递了函数的引用，可以任务这个子进程就执行这里的代码</li>
+<li>args：给target指定的函数传递的参数，以元组的方式传递</li>
+<li>kwargs：给target指定的函数传递命名参数</li>
+<li>name：给进程设定一个名字，可以不设定</li>
+<li>group：指定进程组，大多数情况下用不到</li>
+<li>Process创建的实例对象的常用方法：</li>
+<li>start()：启动子进程实例（创建子进程）</li>
+<li>is_alive()：判断进程子进程是否还在活着</li>
+<li>join([timeout])：是否等待子进程执行结束，或等待多少秒</li>
+<li>terminate()：不管任务是否完成，立即终止子进程</li>
+<li>Process创建的实例对象的常用属性：</li>
+<li>name：当前进程的别名，默认为Process-N，N为从1开始递增的整数</li>
+<li>pid：当前进程的pid（进程号）</li>
+</ul>
+</li>
+</ul>
+<h5 id="4-3-线程与进程的区别"><a href="#4-3-线程与进程的区别" class="headerlink" title="4.3 线程与进程的区别"></a>4.3 线程与进程的区别</h5><ul>
+<li>定义的不同 <ul>
+<li>进程是系统进行资源分配和调度的一个独立单位。</li>
+<li>线程是进程的一个实体，是CPU调度的基本单位。它是比进程更小的能独立运行的基本单位.线程自己基本上不拥有系统资源,只拥有一点在运行中必不可少的资源(如程序计数器,一组寄存器和栈),但是它可与同属一个进程的其他的线程共享进程所拥有的全部资源.</li>
+</ul>
+</li>
+<li><p>区别：</p>
+<ul>
+<li>一个程序至少有一个进程,一个进程至少有一个线程.</li>
+<li>线程的划分尺度小于进程(资源比进程少)，使得多线程程序的并发性高。</li>
+<li>进程在执行过程中拥有独立的内存单元，而多个线程共享内 存，从而极大地提高了程序的运行效率</li>
+<li>线线程不能够独立执行，必须依存在进程中</li>
+</ul>
+</li>
+<li><p>优缺点<br>线程和进程在使用上各有优缺点：线程执行开销小，但不利于资源的管理和保护；而进程正相反。</p>
+</li>
+</ul>
+<h4 id="5-进程间通信–Queue"><a href="#5-进程间通信–Queue" class="headerlink" title="5. 进程间通信–Queue"></a>5. 进程间通信–Queue</h4><p>可以使用multiprocessing模块的Queue实现多进程之间的数据传递，Queue本身是一个消息列队程序，首先用一个小实例来演示一下Queue的工作原理：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Queue</div><div class="line"></div><div class="line">q = Queue(<span class="number">3</span>)   <span class="comment"># 初始化一个Queue对象，最多可接收三条put消息</span></div><div class="line">q.put(<span class="string">"消息1"</span>)</div><div class="line">q.put(<span class="string">"消息2"</span>)</div><div class="line">print(q.full())  <span class="comment"># False</span></div><div class="line">q.put(<span class="string">"消息3"</span>)</div><div class="line">print(q.full())  <span class="comment"># True</span></div><div class="line"></div><div class="line"><span class="comment"># 因为消息队列已满下面的try 都会抛出异常， 第一个try 会等待2秒后再抛出异常，第二个Try会立刻抛出异常</span></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    q.put(<span class="string">"消息4"</span>,<span class="keyword">True</span>,<span class="number">2</span>)</div><div class="line"><span class="keyword">except</span>:</div><div class="line">    print(<span class="string">"消息队列已满，现有消息数量：%s"</span>%q.qsize())</div><div class="line"></div><div class="line"><span class="keyword">try</span>:</div><div class="line">    q.put_nowait(<span class="string">"消息4"</span>)</div><div class="line"><span class="keyword">except</span>:</div><div class="line">    print(<span class="string">"消息队列已满，现有消息数量：%s"</span>%q.qsize())</div><div class="line"></div><div class="line"><span class="comment"># 推荐的方式，先判断消息队列是否已满，再写入</span></div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> q.full():</div><div class="line">    q.put_nowait(<span class="string">"消息4"</span>)</div><div class="line"></div><div class="line"><span class="comment"># 读取消息时，先判断消息队列是否为空，再读取</span></div><div class="line"><span class="keyword">if</span> <span class="keyword">not</span> q.empty():</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(q.qsize()):</div><div class="line">        print(q.get_nowait())</div></pre></td></tr></table></figure></p>
+<p>运行结果：<br><figure class="highlight yaml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="literal">False</span></div><div class="line"><span class="literal">True</span></div><div class="line"><span class="string">消息列队已满，现有消息数量:3</span></div><div class="line"><span class="string">消息列队已满，现有消息数量:3</span></div><div class="line"><span class="string">消息1</span></div><div class="line"><span class="string">消息2</span></div><div class="line"><span class="string">消息3</span></div></pre></td></tr></table></figure></p>
+<ul>
+<li>说明：<br>初始化Queue()对象时（例如：q=Queue()），若括号中没有指定最大可接收的消息数量，或数量为负值，那么就代表可接受的消息数量没有上限（直到内存的尽头）；</li>
+<li>Queue.qsize()：返回当前队列包含的消息数量；</li>
+<li>Queue.empty()：如果队列为空，返回True，反之False ；</li>
+<li>Queue.full()：如果队列满了，返回True,反之False；</li>
+<li>Queue.get([block[, timeout]])：获取队列中的一条消息，然后将其从列队中移除，block默认值为True；<br>1）如果block使用默认值，且没有设置timeout（单位秒），消息列队如果为空，此时程序将被阻塞（停在读取状态），直到从消息列队读到消息为止，<br>如果设置了timeout，则会等待timeout秒，若还没读取到任何消息，则抛出”Queue.Empty”异常；<br>2）如果block值为False，消息列队如果为空，则会立刻抛出”Queue.Empty”异常；</li>
+<li>Queue.get_nowait()：相当Queue.get(False)；</li>
+<li>Queue.put(item,[block[, timeout]])：将item消息写入队列，block默认值为True；<br>1）如果block使用默认值，且没有设置timeout（单位秒），消息列队如果已经没有空间可写入，此时程序将被阻塞（停在写入状态），直到从消息列队腾出空间为止，如果设置了timeout，则会等待timeout秒，若还没空间，则抛出”Queue.Full”异常；<br>2）如果block值为False，消息列队如果没有空间可写入，则会立刻抛出”Queue.Full”异常；</li>
+<li>Queue.put_nowait(item)：相当Queue.put(item, False)；</li>
+<li>Queue.put(item,[block[, timeout]])：将item消息写入队列，block默认值为True；<br>1）如果block使用默认值，且没有设置timeout（单位秒），消息列队如果已经没有空间可写入，此时程序将被阻塞（停在写入状态），直到从消息列队腾出空间为止，如果设置了timeout，则会等待timeout秒，若还没空间，则抛出”Queue.Full”异常；<br>2）如果block值为False，消息列队如果没有空间可写入，则会立刻抛出”Queue.Full”异常；</li>
+<li>Queue.put_nowait(item)：相当Queue.put(item, False)；</li>
+</ul>
+<h5 id="Queue实例"><a href="#Queue实例" class="headerlink" title="Queue实例"></a>Queue实例</h5><p>在父进程中创建两个子进程，一个往Queue里写数据，一个从Queue里读数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Process, Queue</div><div class="line"><span class="keyword">import</span> os, time, random</div><div class="line"></div><div class="line"><span class="comment"># 写数据进程执行的代码:</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">write</span><span class="params">(q)</span>:</span></div><div class="line">    <span class="keyword">for</span> value <span class="keyword">in</span> [<span class="string">'A'</span>, <span class="string">'B'</span>, <span class="string">'C'</span>]:</div><div class="line">        print(<span class="string">'Put %s to queue...'</span> % value)</div><div class="line">        q.put(value)</div><div class="line">        time.sleep(random.random())</div><div class="line"></div><div class="line"><span class="comment"># 读数据进程执行的代码:</span></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">read</span><span class="params">(q)</span>:</span></div><div class="line">    <span class="keyword">while</span> <span class="keyword">True</span>:</div><div class="line">        <span class="keyword">if</span> <span class="keyword">not</span> q.empty():</div><div class="line">            value = q.get(<span class="keyword">True</span>)</div><div class="line">            print(<span class="string">'Get %s from queue.'</span> % value)</div><div class="line">            time.sleep(random.random())</div><div class="line">        <span class="keyword">else</span>:</div><div class="line">            <span class="keyword">break</span></div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__==<span class="string">'__main__'</span>:</div><div class="line">    <span class="comment"># 父进程创建Queue，并传给各个子进程：</span></div><div class="line">    q = Queue()</div><div class="line">    pw = Process(target=write, args=(q,))</div><div class="line">    pr = Process(target=read, args=(q,))</div><div class="line">    <span class="comment"># 启动子进程pw，写入:</span></div><div class="line">    pw.start()    </div><div class="line">    <span class="comment"># 等待pw结束:</span></div><div class="line">    pw.join()</div><div class="line">    <span class="comment"># 启动子进程pr，读取:</span></div><div class="line">    pr.start()</div><div class="line">    pr.join()</div><div class="line">    <span class="comment"># pr进程里是死循环，无法等待其结束，只能强行终止:</span></div><div class="line">    print(<span class="string">''</span>)</div><div class="line">    print(<span class="string">'所有数据都写入并且读完'</span>)</div></pre></td></tr></table></figure>
+<p>运行结果：<br><img src="index_files/13123123123123126.gif" alt=""></p>
+<h4 id="6-进程池Pool"><a href="#6-进程池Pool" class="headerlink" title="6. 进程池Pool"></a>6. 进程池Pool</h4><p>针对大量的目标，手动创建进程的工作量巨大，此时就可以用到multiprocessing模块提供的Pool方法。<br>Pool过程说明：<br>初始化Pool时，可以指定一个最大进程数，当有新的请求提交到Pool中时，如果池还没有满，那么就会创建一个新的进程用来执行该请求；但如果池中的进程数已经达到指定的最大值，那么该请求就会等待，直到池中有进程结束，才会用之前的进程来执行新的任务，请看下面的实例：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Pool</div><div class="line"><span class="keyword">import</span> os, time, random</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">worker</span><span class="params">(msg)</span>:</span></div><div class="line">    t_start = time.time()</div><div class="line">    print(<span class="string">"%s开始执行,进程号为%d"</span> % (msg,os.getpid()))</div><div class="line">    <span class="comment"># random.random()随机生成0~1之间的浮点数</span></div><div class="line">    time.sleep(random.random()*<span class="number">2</span>) </div><div class="line">    t_stop = time.time()</div><div class="line">    print(msg,<span class="string">"执行完毕，耗时%0.2f"</span> % (t_stop-t_start))</div><div class="line"></div><div class="line">po=Pool(<span class="number">3</span>) <span class="comment">#定义一个进程池，最大进程数3</span></div><div class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">0</span>,<span class="number">10</span>):</div><div class="line">    <span class="comment">#Pool().apply_async(要调用的目标,(传递给目标的参数元祖,))</span></div><div class="line">    <span class="comment">#每次循环将会用空闲出来的子进程去调用目标</span></div><div class="line">    po.apply_async(worker,(i,))</div><div class="line"></div><div class="line">print(<span class="string">"----start----"</span>)</div><div class="line">po.close() <span class="comment">#关闭进程池，关闭后po不再接收新的请求</span></div><div class="line">po.join() <span class="comment">#等待po中所有子进程执行完成，必须放在close语句之后</span></div><div class="line">print(<span class="string">"-----end-----"</span>)</div></pre></td></tr></table></figure>
+<p>运行结果:<br><figure class="highlight lsl"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div></pre></td><td class="code"><pre><div class="line">----start----</div><div class="line"><span class="number">0</span>开始执行,进程号为<span class="number">21466</span></div><div class="line"><span class="number">1</span>开始执行,进程号为<span class="number">21468</span></div><div class="line"><span class="number">2</span>开始执行,进程号为<span class="number">21467</span></div><div class="line"><span class="number">0</span> 执行完毕，耗时<span class="number">1.01</span></div><div class="line"><span class="number">3</span>开始执行,进程号为<span class="number">21466</span></div><div class="line"><span class="number">2</span> 执行完毕，耗时<span class="number">1.24</span></div><div class="line"><span class="number">4</span>开始执行,进程号为<span class="number">21467</span></div><div class="line"><span class="number">3</span> 执行完毕，耗时<span class="number">0.56</span></div><div class="line"><span class="number">5</span>开始执行,进程号为<span class="number">21466</span></div><div class="line"><span class="number">1</span> 执行完毕，耗时<span class="number">1.68</span></div><div class="line"><span class="number">6</span>开始执行,进程号为<span class="number">21468</span></div><div class="line"><span class="number">4</span> 执行完毕，耗时<span class="number">0.67</span></div><div class="line"><span class="number">7</span>开始执行,进程号为<span class="number">21467</span></div><div class="line"><span class="number">5</span> 执行完毕，耗时<span class="number">0.83</span></div><div class="line"><span class="number">8</span>开始执行,进程号为<span class="number">21466</span></div><div class="line"><span class="number">6</span> 执行完毕，耗时<span class="number">0.75</span></div><div class="line"><span class="number">9</span>开始执行,进程号为<span class="number">21468</span></div><div class="line"><span class="number">7</span> 执行完毕，耗时<span class="number">1.03</span></div><div class="line"><span class="number">8</span> 执行完毕，耗时<span class="number">1.05</span></div><div class="line"><span class="number">9</span> 执行完毕，耗时<span class="number">1.69</span></div><div class="line">-----end-----</div></pre></td></tr></table></figure></p>
+<ul>
+<li>multiprocessing.Pool常用函数解析：<ul>
+<li>apply_async(func[, args[, kwds]]) ：使用非阻塞方式调用func（并行执行，堵塞方式必须等待上一个进程退出才能执行下一个进程），args为传递给func的参数列表，kwds为传递给func的关键字参数列表；</li>
+<li>close()：关闭Pool，使其不再接受新的任务；</li>
+<li>terminate()：不管任务是否完成，立即终止；</li>
+<li>join()：主进程阻塞，等待子进程的退出， 必须在close或terminate之后使用；</li>
+</ul>
+</li>
+</ul>
+<h5 id="进程池中的Queue"><a href="#进程池中的Queue" class="headerlink" title="进程池中的Queue"></a>进程池中的Queue</h5><p>要使用Pool创建进程，就需要使用multiprocessing.Manager()中的Queue(),而不是multiprocesing.Queue()，否则会得到一条如下的错误信息：</p>
+<p>RuntimeError: Queue objects should only be shared between processes through inheritance.</p>
+<p>进程池中的进程通信：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 修改import中的Queue为Manager</span></div><div class="line"><span class="keyword">from</span> multiprocessing <span class="keyword">import</span> Manager,Pool</div><div class="line"><span class="keyword">import</span> os,time,random</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">reader</span><span class="params">(q)</span>:</span></div><div class="line">    print(<span class="string">"reader启动(%s),父进程为(%s)"</span> % (os.getpid(), os.getppid()))</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(q.qsize()):</div><div class="line">        print(<span class="string">"reader从Queue获取到消息：%s"</span> % q.get(<span class="keyword">True</span>))</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">def</span> <span class="title">writer</span><span class="params">(q)</span>:</span></div><div class="line">    print(<span class="string">"writer启动(%s),父进程为(%s)"</span> % (os.getpid(), os.getppid()))</div><div class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="string">"itcast"</span>:</div><div class="line">        q.put(i)</div><div class="line"></div><div class="line"><span class="keyword">if</span> __name__==<span class="string">"__main__"</span>:</div><div class="line">    print(<span class="string">"(%s) start"</span> % os.getpid())</div><div class="line">    q = Manager().Queue()  <span class="comment"># 使用Manager中的Queue</span></div><div class="line">    po = Pool()</div><div class="line">    <span class="comment"># 使用阻塞模式创建进程，这样就不需要在reader中使用死循环了，可以让writer完全执行完成后，再用reader去读取</span></div><div class="line">    po.apply_async(writer, (q,))</div><div class="line"></div><div class="line">    time.sleep(<span class="number">1</span>)  <span class="comment"># 先让上面的任务向Queue存入数据，然后再让下面的任务开始从中取数据</span></div><div class="line"></div><div class="line">    po.apply_async(reader, (q,))</div><div class="line">    po.close()</div><div class="line">    po.join()</div><div class="line">    print(<span class="string">"(%s) End"</span> % os.getpid())</div></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<figure class="highlight gcode"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div></pre></td><td class="code"><pre><div class="line"><span class="comment">(11095)</span> start</div><div class="line">writer启动<span class="comment">(11097)</span>,父进程为<span class="comment">(11095)</span></div><div class="line">reader启动<span class="comment">(11098)</span>,父进程为<span class="comment">(11095)</span></div><div class="line">reader从Queue获取到消息：i</div><div class="line">reader从Queue获取到消息：t</div><div class="line">reader从Queue获取到消息：c</div><div class="line">reader从Queue获取到消息：a</div><div class="line">reader从Queue获取到消息：s</div><div class="line">reader从Queue获取到消息：t</div><div class="line"><span class="comment">(11095)</span> E<span class="symbol">nd</span></div></pre></td></tr></table></figure>
+
+      
+
+      
+        <div class="page-reward">
+          <a href="javascript:;" class="page-reward-btn tooltip-top">
+            <div class="tooltip tooltip-east">
+            <span class="tooltip-item">
+              赏
+            </span>
+            <span class="tooltip-content">
+              <span class="tooltip-text">
+                <span class="tooltip-inner">
+                  <p class="reward-p"><i class="icon icon-quo-left"></i>谢谢你请我吃冰淇淋<i class="icon icon-quo-right"></i></p>
+                  <div class="reward-box">
+                    
+                    
+                  </div>
+                </span>
+              </span>
+            </span>
+          </div>
+          </a>
+        </div>
+      
+    </div>
+    <div class="article-info article-info-index">
+      
+      
+	<div class="article-tag tagcloud">
+		<i class="icon-price-tags icon"></i>
+		<ul class="article-tag-list">
+			 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">线程</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color3">进程</a>
+        		</li>
+      		 
+        		<li class="article-tag-list-item">
+        			<a href="javascript:void(0)" class="js-tag article-tag-list-link color2">python</a>
+        		</li>
+      		
+		</ul>
+	</div>
+
+      
+
+      
+
+      
+        
+<div class="share-btn share-icons tooltip-left">
+  <div class="tooltip tooltip-east">
+    <span class="tooltip-item">
+      <a href="javascript:;" class="share-sns share-outer">
+        <i class="icon icon-share"></i>
+      </a>
+    </span>
+    <span class="tooltip-content">
+      <div class="share-wrap">
+        <div class="share-icons">
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="icon icon-weibo"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="icon icon-weixin"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="icon icon-qq"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="icon icon-douban"></i>
+          </a>
+          <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a>
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="icon icon-facebook"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="icon icon-twitter"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="icon icon-google"></i>
+          </a>
+        </div>
+      </div>
+    </span>
+  </div>
+</div>
+
+<div class="page-modal wx-share js-wx-box">
+    <a class="close js-modal-close" href="javascript:;"><i class="icon icon-close"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="http://s.jiathis.com/qrcode.php?url=http://yoursite.com/2017/07/14/Python进阶01-多线程编程/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div class="mask js-mask"></div>
+      
+      <div class="clearfix"></div>
+    </div>
+  </div>
+</article>
+
+  
+<nav id="article-nav">
+  
+    <a href="/2017/10/10/hello-world/" id="article-nav-newer" class="article-nav-link-wrap">
+      <i class="icon-circle-left"></i>
+      <div class="article-nav-title">
+        
+          Hello World
+        
+      </div>
+    </a>
+  
+  
+</nav>
+
+
+
+
+
+
+  
+    <div class="duoshuo"></div>
+  
+
+
+
+
+          </div>
+        </div>
+      </div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2017 Dylan
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    <script>
+	var yiliaConfig = {
+		mathjax: false,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false,
+		root: "/",
+		innerArchive: true,
+		showTags: false
+	}
+</script>
+
+<script>!function(t){function n(r){if(e[r])return e[r].exports;var o=e[r]={exports:{},id:r,loaded:!1};return t[r].call(o.exports,o,o.exports,n),o.loaded=!0,o.exports}var e={};return n.m=t,n.c=e,n.p="./",n(0)}([function(t,n,e){"use strict";function r(t){return t&&t.__esModule?t:{default:t}}function o(t,n){var e=/\/|index.html/g;return t.replace(e,"")===n.replace(e,"")}function i(){for(var t=document.querySelectorAll(".js-header-menu li a"),n=window.location.pathname,e=0,r=t.length;e<r;e++){var i=t[e];o(n,i.getAttribute("href"))&&(0,d.default)(i,"active")}}function u(t){for(var n=t.offsetLeft,e=t.offsetParent;null!==e;)n+=e.offsetLeft,e=e.offsetParent;return n}function f(t){for(var n=t.offsetTop,e=t.offsetParent;null!==e;)n+=e.offsetTop,e=e.offsetParent;return n}function c(t,n,e,r,o){var i=u(t),c=f(t)-n;if(c-e<=o){var a=t.$newDom;a||(a=t.cloneNode(!0),(0,h.default)(t,a),t.$newDom=a,a.style.position="fixed",a.style.top=(e||c)+"px",a.style.left=i+"px",a.style.zIndex=r||2,a.style.width="100%",a.style.color="#fff"),a.style.visibility="visible",t.style.visibility="hidden"}else{t.style.visibility="visible";var s=t.$newDom;s&&(s.style.visibility="hidden")}}function a(){var t=document.querySelector(".js-overlay"),n=document.querySelector(".js-header-menu");c(t,document.body.scrollTop,-63,2,0),c(n,document.body.scrollTop,1,3,0)}function s(){document.querySelector("#container").addEventListener("scroll",function(t){a()}),window.addEventListener("scroll",function(t){a()}),a()}function l(){x.default.versions.mobile&&window.screen.width<800&&(i(),s())}var p=e(71),d=r(p),v=e(72),y=(r(v),e(84)),h=r(y),b=e(69),x=r(b),m=e(75),g=r(m),w=e(70);l(),(0,w.addLoadEvent)(function(){g.default.init()}),t.exports={}},function(t,n){var e=t.exports="undefined"!=typeof window&&window.Math==Math?window:"undefined"!=typeof self&&self.Math==Math?self:Function("return this")();"number"==typeof __g&&(__g=e)},function(t,n){var e={}.hasOwnProperty;t.exports=function(t,n){return e.call(t,n)}},function(t,n,e){var r=e(49),o=e(15);t.exports=function(t){return r(o(t))}},function(t,n,e){t.exports=!e(8)(function(){return 7!=Object.defineProperty({},"a",{get:function(){return 7}}).a})},function(t,n,e){var r=e(6),o=e(12);t.exports=e(4)?function(t,n,e){return r.f(t,n,o(1,e))}:function(t,n,e){return t[n]=e,t}},function(t,n,e){var r=e(10),o=e(30),i=e(24),u=Object.defineProperty;n.f=e(4)?Object.defineProperty:function(t,n,e){if(r(t),n=i(n,!0),r(e),o)try{return u(t,n,e)}catch(t){}if("get"in e||"set"in e)throw TypeError("Accessors not supported!");return"value"in e&&(t[n]=e.value),t}},function(t,n,e){var r=e(22)("wks"),o=e(13),i=e(1).Symbol,u="function"==typeof i,f=t.exports=function(t){return r[t]||(r[t]=u&&i[t]||(u?i:o)("Symbol."+t))};f.store=r},function(t,n){t.exports=function(t){try{return!!t()}catch(t){return!0}}},function(t,n,e){var r=e(35),o=e(16);t.exports=Object.keys||function(t){return r(t,o)}},function(t,n,e){var r=e(11);t.exports=function(t){if(!r(t))throw TypeError(t+" is not an object!");return t}},function(t,n){t.exports=function(t){return"object"==typeof t?null!==t:"function"==typeof t}},function(t,n){t.exports=function(t,n){return{enumerable:!(1&t),configurable:!(2&t),writable:!(4&t),value:n}}},function(t,n){var e=0,r=Math.random();t.exports=function(t){return"Symbol(".concat(void 0===t?"":t,")_",(++e+r).toString(36))}},function(t,n){var e=t.exports={version:"2.4.0"};"number"==typeof __e&&(__e=e)},function(t,n){t.exports=function(t){if(void 0==t)throw TypeError("Can't call method on  "+t);return t}},function(t,n){t.exports="constructor,hasOwnProperty,isPrototypeOf,propertyIsEnumerable,toLocaleString,toString,valueOf".split(",")},function(t,n){t.exports={}},function(t,n){t.exports=!0},function(t,n){n.f={}.propertyIsEnumerable},function(t,n,e){var r=e(6).f,o=e(2),i=e(7)("toStringTag");t.exports=function(t,n,e){t&&!o(t=e?t:t.prototype,i)&&r(t,i,{configurable:!0,value:n})}},function(t,n,e){var r=e(22)("keys"),o=e(13);t.exports=function(t){return r[t]||(r[t]=o(t))}},function(t,n,e){var r=e(1),o="__core-js_shared__",i=r[o]||(r[o]={});t.exports=function(t){return i[t]||(i[t]={})}},function(t,n){var e=Math.ceil,r=Math.floor;t.exports=function(t){return isNaN(t=+t)?0:(t>0?r:e)(t)}},function(t,n,e){var r=e(11);t.exports=function(t,n){if(!r(t))return t;var e,o;if(n&&"function"==typeof(e=t.toString)&&!r(o=e.call(t)))return o;if("function"==typeof(e=t.valueOf)&&!r(o=e.call(t)))return o;if(!n&&"function"==typeof(e=t.toString)&&!r(o=e.call(t)))return o;throw TypeError("Can't convert object to primitive value")}},function(t,n,e){var r=e(1),o=e(14),i=e(18),u=e(26),f=e(6).f;t.exports=function(t){var n=o.Symbol||(o.Symbol=i?{}:r.Symbol||{});"_"==t.charAt(0)||t in n||f(n,t,{value:u.f(t)})}},function(t,n,e){n.f=e(7)},function(t,n,e){var r=e(1),o=e(14),i=e(46),u=e(5),f="prototype",c=function(t,n,e){var a,s,l,p=t&c.F,d=t&c.G,v=t&c.S,y=t&c.P,h=t&c.B,b=t&c.W,x=d?o:o[n]||(o[n]={}),m=x[f],g=d?r:v?r[n]:(r[n]||{})[f];d&&(e=n);for(a in e)s=!p&&g&&void 0!==g[a],s&&a in x||(l=s?g[a]:e[a],x[a]=d&&"function"!=typeof g[a]?e[a]:h&&s?i(l,r):b&&g[a]==l?function(t){var n=function(n,e,r){if(this instanceof t){switch(arguments.length){case 0:return new t;case 1:return new t(n);case 2:return new t(n,e)}return new t(n,e,r)}return t.apply(this,arguments)};return n[f]=t[f],n}(l):y&&"function"==typeof l?i(Function.call,l):l,y&&((x.virtual||(x.virtual={}))[a]=l,t&c.R&&m&&!m[a]&&u(m,a,l)))};c.F=1,c.G=2,c.S=4,c.P=8,c.B=16,c.W=32,c.U=64,c.R=128,t.exports=c},function(t,n){var e={}.toString;t.exports=function(t){return e.call(t).slice(8,-1)}},function(t,n,e){var r=e(11),o=e(1).document,i=r(o)&&r(o.createElement);t.exports=function(t){return i?o.createElement(t):{}}},function(t,n,e){t.exports=!e(4)&&!e(8)(function(){return 7!=Object.defineProperty(e(29)("div"),"a",{get:function(){return 7}}).a})},function(t,n,e){"use strict";var r=e(18),o=e(27),i=e(36),u=e(5),f=e(2),c=e(17),a=e(51),s=e(20),l=e(58),p=e(7)("iterator"),d=!([].keys&&"next"in[].keys()),v="@@iterator",y="keys",h="values",b=function(){return this};t.exports=function(t,n,e,x,m,g,w){a(e,n,x);var O,S,_,j=function(t){if(!d&&t in A)return A[t];switch(t){case y:return function(){return new e(this,t)};case h:return function(){return new e(this,t)}}return function(){return new e(this,t)}},P=n+" Iterator",E=m==h,M=!1,A=t.prototype,T=A[p]||A[v]||m&&A[m],L=T||j(m),N=m?E?j("entries"):L:void 0,C="Array"==n?A.entries||T:T;if(C&&(_=l(C.call(new t)),_!==Object.prototype&&(s(_,P,!0),r||f(_,p)||u(_,p,b))),E&&T&&T.name!==h&&(M=!0,L=function(){return T.call(this)}),r&&!w||!d&&!M&&A[p]||u(A,p,L),c[n]=L,c[P]=b,m)if(O={values:E?L:j(h),keys:g?L:j(y),entries:N},w)for(S in O)S in A||i(A,S,O[S]);else o(o.P+o.F*(d||M),n,O);return O}},function(t,n,e){var r=e(10),o=e(55),i=e(16),u=e(21)("IE_PROTO"),f=function(){},c="prototype",a=function(){var t,n=e(29)("iframe"),r=i.length,o="<",u=">";for(n.style.display="none",e(48).appendChild(n),n.src="javascript:",t=n.contentWindow.document,t.open(),t.write(o+"script"+u+"document.F=Object"+o+"/script"+u),t.close(),a=t.F;r--;)delete a[c][i[r]];return a()};t.exports=Object.create||function(t,n){var e;return null!==t?(f[c]=r(t),e=new f,f[c]=null,e[u]=t):e=a(),void 0===n?e:o(e,n)}},function(t,n,e){var r=e(35),o=e(16).concat("length","prototype");n.f=Object.getOwnPropertyNames||function(t){return r(t,o)}},function(t,n){n.f=Object.getOwnPropertySymbols},function(t,n,e){var r=e(2),o=e(3),i=e(45)(!1),u=e(21)("IE_PROTO");t.exports=function(t,n){var e,f=o(t),c=0,a=[];for(e in f)e!=u&&r(f,e)&&a.push(e);for(;n.length>c;)r(f,e=n[c++])&&(~i(a,e)||a.push(e));return a}},function(t,n,e){t.exports=e(5)},function(t,n,e){var r=e(15);t.exports=function(t){return Object(r(t))}},function(t,n,e){t.exports={default:e(41),__esModule:!0}},function(t,n,e){t.exports={default:e(42),__esModule:!0}},function(t,n,e){"use strict";function r(t){return t&&t.__esModule?t:{default:t}}n.__esModule=!0;var o=e(39),i=r(o),u=e(38),f=r(u),c="function"==typeof f.default&&"symbol"==typeof i.default?function(t){return typeof t}:function(t){return t&&"function"==typeof f.default&&t.constructor===f.default&&t!==f.default.prototype?"symbol":typeof t};n.default="function"==typeof f.default&&"symbol"===c(i.default)?function(t){return"undefined"==typeof t?"undefined":c(t)}:function(t){return t&&"function"==typeof f.default&&t.constructor===f.default&&t!==f.default.prototype?"symbol":"undefined"==typeof t?"undefined":c(t)}},function(t,n,e){e(65),e(63),e(66),e(67),t.exports=e(14).Symbol},function(t,n,e){e(64),e(68),t.exports=e(26).f("iterator")},function(t,n){t.exports=function(t){if("function"!=typeof t)throw TypeError(t+" is not a function!");return t}},function(t,n){t.exports=function(){}},function(t,n,e){var r=e(3),o=e(61),i=e(60);t.exports=function(t){return function(n,e,u){var f,c=r(n),a=o(c.length),s=i(u,a);if(t&&e!=e){for(;a>s;)if(f=c[s++],f!=f)return!0}else for(;a>s;s++)if((t||s in c)&&c[s]===e)return t||s||0;return!t&&-1}}},function(t,n,e){var r=e(43);t.exports=function(t,n,e){if(r(t),void 0===n)return t;switch(e){case 1:return function(e){return t.call(n,e)};case 2:return function(e,r){return t.call(n,e,r)};case 3:return function(e,r,o){return t.call(n,e,r,o)}}return function(){return t.apply(n,arguments)}}},function(t,n,e){var r=e(9),o=e(34),i=e(19);t.exports=function(t){var n=r(t),e=o.f;if(e)for(var u,f=e(t),c=i.f,a=0;f.length>a;)c.call(t,u=f[a++])&&n.push(u);return n}},function(t,n,e){t.exports=e(1).document&&document.documentElement},function(t,n,e){var r=e(28);t.exports=Object("z").propertyIsEnumerable(0)?Object:function(t){return"String"==r(t)?t.split(""):Object(t)}},function(t,n,e){var r=e(28);t.exports=Array.isArray||function(t){return"Array"==r(t)}},function(t,n,e){"use strict";var r=e(32),o=e(12),i=e(20),u={};e(5)(u,e(7)("iterator"),function(){return this}),t.exports=function(t,n,e){t.prototype=r(u,{next:o(1,e)}),i(t,n+" Iterator")}},function(t,n){t.exports=function(t,n){return{value:n,done:!!t}}},function(t,n,e){var r=e(9),o=e(3);t.exports=function(t,n){for(var e,i=o(t),u=r(i),f=u.length,c=0;f>c;)if(i[e=u[c++]]===n)return e}},function(t,n,e){var r=e(13)("meta"),o=e(11),i=e(2),u=e(6).f,f=0,c=Object.isExtensible||function(){return!0},a=!e(8)(function(){return c(Object.preventExtensions({}))}),s=function(t){u(t,r,{value:{i:"O"+ ++f,w:{}}})},l=function(t,n){if(!o(t))return"symbol"==typeof t?t:("string"==typeof t?"S":"P")+t;if(!i(t,r)){if(!c(t))return"F";if(!n)return"E";s(t)}return t[r].i},p=function(t,n){if(!i(t,r)){if(!c(t))return!0;if(!n)return!1;s(t)}return t[r].w},d=function(t){return a&&v.NEED&&c(t)&&!i(t,r)&&s(t),t},v=t.exports={KEY:r,NEED:!1,fastKey:l,getWeak:p,onFreeze:d}},function(t,n,e){var r=e(6),o=e(10),i=e(9);t.exports=e(4)?Object.defineProperties:function(t,n){o(t);for(var e,u=i(n),f=u.length,c=0;f>c;)r.f(t,e=u[c++],n[e]);return t}},function(t,n,e){var r=e(19),o=e(12),i=e(3),u=e(24),f=e(2),c=e(30),a=Object.getOwnPropertyDescriptor;n.f=e(4)?a:function(t,n){if(t=i(t),n=u(n,!0),c)try{return a(t,n)}catch(t){}if(f(t,n))return o(!r.f.call(t,n),t[n])}},function(t,n,e){var r=e(3),o=e(33).f,i={}.toString,u="object"==typeof window&&window&&Object.getOwnPropertyNames?Object.getOwnPropertyNames(window):[],f=function(t){try{return o(t)}catch(t){return u.slice()}};t.exports.f=function(t){return u&&"[object Window]"==i.call(t)?f(t):o(r(t))}},function(t,n,e){var r=e(2),o=e(37),i=e(21)("IE_PROTO"),u=Object.prototype;t.exports=Object.getPrototypeOf||function(t){return t=o(t),r(t,i)?t[i]:"function"==typeof t.constructor&&t instanceof t.constructor?t.constructor.prototype:t instanceof Object?u:null}},function(t,n,e){var r=e(23),o=e(15);t.exports=function(t){return function(n,e){var i,u,f=String(o(n)),c=r(e),a=f.length;return c<0||c>=a?t?"":void 0:(i=f.charCodeAt(c),i<55296||i>56319||c+1===a||(u=f.charCodeAt(c+1))<56320||u>57343?t?f.charAt(c):i:t?f.slice(c,c+2):(i-55296<<10)+(u-56320)+65536)}}},function(t,n,e){var r=e(23),o=Math.max,i=Math.min;t.exports=function(t,n){return t=r(t),t<0?o(t+n,0):i(t,n)}},function(t,n,e){var r=e(23),o=Math.min;t.exports=function(t){return t>0?o(r(t),9007199254740991):0}},function(t,n,e){"use strict";var r=e(44),o=e(52),i=e(17),u=e(3);t.exports=e(31)(Array,"Array",function(t,n){this._t=u(t),this._i=0,this._k=n},function(){var t=this._t,n=this._k,e=this._i++;return!t||e>=t.length?(this._t=void 0,o(1)):"keys"==n?o(0,e):"values"==n?o(0,t[e]):o(0,[e,t[e]])},"values"),i.Arguments=i.Array,r("keys"),r("values"),r("entries")},function(t,n){},function(t,n,e){"use strict";var r=e(59)(!0);e(31)(String,"String",function(t){this._t=String(t),this._i=0},function(){var t,n=this._t,e=this._i;return e>=n.length?{value:void 0,done:!0}:(t=r(n,e),this._i+=t.length,{value:t,done:!1})})},function(t,n,e){"use strict";var r=e(1),o=e(2),i=e(4),u=e(27),f=e(36),c=e(54).KEY,a=e(8),s=e(22),l=e(20),p=e(13),d=e(7),v=e(26),y=e(25),h=e(53),b=e(47),x=e(50),m=e(10),g=e(3),w=e(24),O=e(12),S=e(32),_=e(57),j=e(56),P=e(6),E=e(9),M=j.f,A=P.f,T=_.f,L=r.Symbol,N=r.JSON,C=N&&N.stringify,k="prototype",F=d("_hidden"),q=d("toPrimitive"),I={}.propertyIsEnumerable,B=s("symbol-registry"),D=s("symbols"),W=s("op-symbols"),H=Object[k],K="function"==typeof L,R=r.QObject,J=!R||!R[k]||!R[k].findChild,U=i&&a(function(){return 7!=S(A({},"a",{get:function(){return A(this,"a",{value:7}).a}})).a})?function(t,n,e){var r=M(H,n);r&&delete H[n],A(t,n,e),r&&t!==H&&A(H,n,r)}:A,G=function(t){var n=D[t]=S(L[k]);return n._k=t,n},$=K&&"symbol"==typeof L.iterator?function(t){return"symbol"==typeof t}:function(t){return t instanceof L},z=function(t,n,e){return t===H&&z(W,n,e),m(t),n=w(n,!0),m(e),o(D,n)?(e.enumerable?(o(t,F)&&t[F][n]&&(t[F][n]=!1),e=S(e,{enumerable:O(0,!1)})):(o(t,F)||A(t,F,O(1,{})),t[F][n]=!0),U(t,n,e)):A(t,n,e)},Y=function(t,n){m(t);for(var e,r=b(n=g(n)),o=0,i=r.length;i>o;)z(t,e=r[o++],n[e]);return t},Q=function(t,n){return void 0===n?S(t):Y(S(t),n)},X=function(t){var n=I.call(this,t=w(t,!0));return!(this===H&&o(D,t)&&!o(W,t))&&(!(n||!o(this,t)||!o(D,t)||o(this,F)&&this[F][t])||n)},V=function(t,n){if(t=g(t),n=w(n,!0),t!==H||!o(D,n)||o(W,n)){var e=M(t,n);return!e||!o(D,n)||o(t,F)&&t[F][n]||(e.enumerable=!0),e}},Z=function(t){for(var n,e=T(g(t)),r=[],i=0;e.length>i;)o(D,n=e[i++])||n==F||n==c||r.push(n);return r},tt=function(t){for(var n,e=t===H,r=T(e?W:g(t)),i=[],u=0;r.length>u;)!o(D,n=r[u++])||e&&!o(H,n)||i.push(D[n]);return i};K||(L=function(){if(this instanceof L)throw TypeError("Symbol is not a constructor!");var t=p(arguments.length>0?arguments[0]:void 0),n=function(e){this===H&&n.call(W,e),o(this,F)&&o(this[F],t)&&(this[F][t]=!1),U(this,t,O(1,e))};return i&&J&&U(H,t,{configurable:!0,set:n}),G(t)},f(L[k],"toString",function(){return this._k}),j.f=V,P.f=z,e(33).f=_.f=Z,e(19).f=X,e(34).f=tt,i&&!e(18)&&f(H,"propertyIsEnumerable",X,!0),v.f=function(t){return G(d(t))}),u(u.G+u.W+u.F*!K,{Symbol:L});for(var nt="hasInstance,isConcatSpreadable,iterator,match,replace,search,species,split,toPrimitive,toStringTag,unscopables".split(","),et=0;nt.length>et;)d(nt[et++]);for(var nt=E(d.store),et=0;nt.length>et;)y(nt[et++]);u(u.S+u.F*!K,"Symbol",{for:function(t){return o(B,t+="")?B[t]:B[t]=L(t)},keyFor:function(t){if($(t))return h(B,t);throw TypeError(t+" is not a symbol!")},useSetter:function(){J=!0},useSimple:function(){J=!1}}),u(u.S+u.F*!K,"Object",{create:Q,defineProperty:z,defineProperties:Y,getOwnPropertyDescriptor:V,getOwnPropertyNames:Z,getOwnPropertySymbols:tt}),N&&u(u.S+u.F*(!K||a(function(){var t=L();return"[null]"!=C([t])||"{}"!=C({a:t})||"{}"!=C(Object(t))})),"JSON",{stringify:function(t){if(void 0!==t&&!$(t)){for(var n,e,r=[t],o=1;arguments.length>o;)r.push(arguments[o++]);return n=r[1],"function"==typeof n&&(e=n),!e&&x(n)||(n=function(t,n){if(e&&(n=e.call(this,t,n)),!$(n))return n}),r[1]=n,C.apply(N,r)}}}),L[k][q]||e(5)(L[k],q,L[k].valueOf),l(L,"Symbol"),l(Math,"Math",!0),l(r.JSON,"JSON",!0)},function(t,n,e){e(25)("asyncIterator")},function(t,n,e){e(25)("observable")},function(t,n,e){e(62);for(var r=e(1),o=e(5),i=e(17),u=e(7)("toStringTag"),f=["NodeList","DOMTokenList","MediaList","StyleSheetList","CSSRuleList"],c=0;c<5;c++){var a=f[c],s=r[a],l=s&&s.prototype;l&&!l[u]&&o(l,u,a),i[a]=i.Array}},function(t,n){"use strict";var e={versions:function(){var t=window.navigator.userAgent;return{trident:t.indexOf("Trident")>-1,presto:t.indexOf("Presto")>-1,webKit:t.indexOf("AppleWebKit")>-1,gecko:t.indexOf("Gecko")>-1&&t.indexOf("KHTML")==-1,mobile:!!t.match(/AppleWebKit.*Mobile.*/),ios:!!t.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/),android:t.indexOf("Android")>-1||t.indexOf("Linux")>-1,iPhone:t.indexOf("iPhone")>-1||t.indexOf("Mac")>-1,iPad:t.indexOf("iPad")>-1,webApp:t.indexOf("Safari")==-1,weixin:t.indexOf("MicroMessenger")==-1}}()};t.exports=e},function(t,n,e){"use strict";function r(t){return t&&t.__esModule?t:{default:t}}var o=e(40),i=r(o),u=function(){function t(t,n,e){return n||e?String.fromCharCode(n||e):o[t]||t}function n(t){return l[t]}var e=/&quot;|&lt;|&gt;|&amp;|&nbsp;|&apos;|&#(\d+);|&#(\d+)/g,r=/['<> "&]/g,o={"&quot;":'"',"&lt;":"<","&gt;":">","&amp;":"&","&nbsp;":" "},f=/\u00a0/g,c=/<br\s*\/?>/gi,a=/\r?\n/g,s=/\s/g,l={};for(var p in o)l[o[p]]=p;return o["&apos;"]="'",l["'"]="&#39;",{encode:function(t){return t?(""+t).replace(r,n).replace(a,"<br/>").replace(s,"&nbsp;"):""},decode:function(n){return n?(""+n).replace(c,"\n").replace(e,t).replace(f," "):""},encodeBase16:function(t){if(!t)return t;t+="";for(var n=[],e=0,r=t.length;r>e;e++)n.push(t.charCodeAt(e).toString(16).toUpperCase());return n.join("")},encodeBase16forJSON:function(t){if(!t)return t;t=t.replace(/[\u4E00-\u9FBF]/gi,function(t){return escape(t).replace("%u","\\u")});for(var n=[],e=0,r=t.length;r>e;e++)n.push(t.charCodeAt(e).toString(16).toUpperCase());return n.join("")},decodeBase16:function(t){if(!t)return t;t+="";for(var n=[],e=0,r=t.length;r>e;e+=2)n.push(String.fromCharCode("0x"+t.slice(e,e+2)));return n.join("")},encodeObject:function(t){if(t instanceof Array)for(var n=0,e=t.length;e>n;n++)t[n]=u.encodeObject(t[n]);else if("object"==("undefined"==typeof t?"undefined":(0,i.default)(t)))for(var r in t)t[r]=u.encodeObject(t[r]);else if("string"==typeof t)return u.encode(t);return t},loadScript:function(t){var n=document.createElement("script");document.getElementsByTagName("body")[0].appendChild(n),n.setAttribute("src",t)},addLoadEvent:function(t){var n=window.onload;"function"!=typeof window.onload?window.onload=t:window.onload=function(){n(),t()}}}}();t.exports=u},function(t,n){function e(t,n){t.classList?t.classList.add(n):t.className+=" "+n}t.exports=e},function(t,n){function e(t,n){if(t.classList)t.classList.remove(n);else{var e=new RegExp("(^|\\b)"+n.split(" ").join("|")+"(\\b|$)","gi");t.className=t.className.replace(e," ")}}t.exports=e},,,function(t,n){"use strict";function e(){var t=document.querySelector("#page-nav");if(t&&!document.querySelector("#page-nav .extend.prev")&&(t.innerHTML='<a class="extend prev disabled" rel="prev">&laquo; Prev</a>'+t.innerHTML),t&&!document.querySelector("#page-nav .extend.next")&&(t.innerHTML=t.innerHTML+'<a class="extend next disabled" rel="next">Next &raquo;</a>'),yiliaConfig&&yiliaConfig.open_in_new){var n=document.querySelectorAll(".article-entry a:not(.article-more-a)");n.forEach(function(t){t.setAttribute("target","_blank")})}var e=document.querySelector("#js-aboutme");e&&0!==e.length&&(e.innerHTML=e.innerText)}t.exports={init:e}},,,,,,,,,function(t,n){function e(t,n){if("string"==typeof n)return t.insertAdjacentHTML("afterend",n);var e=t.nextSibling;return e?t.parentNode.insertBefore(n,e):t.parentNode.appendChild(n)}t.exports=e}])</script><script src="/./main.04d600.js"></script><script>!function(){var e=function(e){var t=document.createElement("script");document.getElementsByTagName("body")[0].appendChild(t),t.setAttribute("src",e)};e("/slider.885efe.js")}()</script>
+
+
+    
+<div class="tools-col" q-class="show:isShow,hide:isShow|isFalse" q-on="click:stop(e)">
+  <div class="tools-nav header-menu">
+    
+    
+      
+      
+      
+    
+      
+      
+      
+    
+      
+      
+      
+    
+    
+
+    <ul style="width: 70%">
+    
+    
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'innerArchive')"><a href="javascript:void(0)" q-class="active:innerArchive">所有文章</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'friends')"><a href="javascript:void(0)" q-class="active:friends">友链</a></li>
+      
+        
+      
+      <li style="width: 33.333333333333336%" q-on="click: openSlider(e, 'aboutme')"><a href="javascript:void(0)" q-class="active:aboutme">关于我</a></li>
+      
+        
+    </ul>
+  </div>
+  <div class="tools-wrap">
+    
+    	<section class="tools-section tools-section-all" q-show="innerArchive">
+        <div class="search-wrap">
+          <input class="search-ipt" q-model="search" type="text" placeholder="find something…">
+          <i class="icon-search icon" q-show="search|isEmptyStr"></i>
+          <i class="icon-close icon" q-show="search|isNotEmptyStr" q-on="click:clearChose(e)"></i>
+        </div>
+        <div class="widget tagcloud search-tag">
+          <p class="search-tag-wording">tag:</p>
+          <label class="search-switch">
+            <input type="checkbox" q-on="click:toggleTag(e)" q-attr="checked:showTags">
+          </label>
+          <ul class="article-tag-list" q-show="showTags">
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">线程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color3">进程</a>
+              </li>
+             
+              <li class="article-tag-list-item">
+                <a href="javascript:void(0)" class="js-tag color2">python</a>
+              </li>
+            
+            <div class="clearfix"></div>
+          </ul>
+        </div>
+        <ul class="search-ul">
+          <p q-show="jsonFail" style="padding: 20px; font-size: 12px;">
+            缺失模块。<br/>1、在博客根目录（注意不是yilia根目录）执行以下命令：<br/> npm i hexo-generator-json-content --save<br/><br/>
+            2、在根目录_config.yml里添加配置：
+<pre style="font-size: 12px;" q-show="jsonFail">
+  jsonContent:
+    meta: false
+    pages: false
+    posts:
+      title: true
+      date: true
+      path: true
+      text: true
+      raw: false
+      content: false
+      slug: false
+      updated: false
+      comments: false
+      link: false
+      permalink: false
+      excerpt: false
+      categories: false
+      tags: true
+</pre>
+          </p>
+          <li class="search-li" q-repeat="items" q-show="isShow">
+            <a q-attr="href:path|urlformat" class="search-title"><i class="icon-quo-left icon"></i><span q-text="title"></span></a>
+            <p class="search-time">
+              <i class="icon-calendar icon"></i>
+              <span q-text="date|dateformat"></span>
+            </p>
+            <p class="search-tag">
+              <i class="icon-price-tags icon"></i>
+              <span q-repeat="tags" q-on="click:choseTag(e, name)" q-text="name|tagformat"></span>
+            </p>
+          </li>
+        </ul>
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-friends" q-show="friends">
+  		
+        <ul class="search-ul">
+          
+            <li class="search-li">
+              <a href="http://blog.csdn.net/u011597049" target="_blank" class="search-title"><i class="icon-quo-left icon"></i>我的csdn博客</a>
+            </li>
+          
+        </ul>
+  		
+    	</section>
+    
+
+    
+    	<section class="tools-section tools-section-me" q-show="aboutme">
+  	  	
+  	  		<div class="aboutme-wrap" id="js-aboutme">为梦想,&lt;br&gt; 在前行,&lt;br&gt; 在追逐,&lt;br&gt; 在路上。</div>
+  	  	
+    	</section>
+    
+  </div>
+  
+</div>
+    <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+  </div>
+</body>
+</html>
